@@ -2,6 +2,11 @@ This plugin is a service that can perform geo-fencing by creating a polygon geof
 
 [![pub package](https://img.shields.io/pub/v/poly_geofence_service.svg)](https://pub.dev/packages/poly_geofence_service)
 
+## Screenshots
+| Google Maps | Result |
+|---|---|
+| <img src="https://user-images.githubusercontent.com/47127353/115559838-07ff7e00-a2ef-11eb-9495-e78093d591de.png" width="216"> | <img src="https://user-images.githubusercontent.com/47127353/115560180-4e54dd00-a2ef-11eb-8d7b-2d73630512b6.png" width="216"> |
+
 ## Features
 
 * Complex geo-fencing can be performed by creating polygon geofence.
