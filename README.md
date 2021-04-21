@@ -65,3 +65,183 @@ If you want to run the service in the background, add the following permissions.
     <string>location</string>
 </array>
 ```
+
+## How to use
+
+1. Create a `PolyGeofenceService` instance and set options. `PolyGeofenceService.instance.setup()` provides the following options:
+* `interval`: The time interval in milliseconds to check the polygon geofence status. The default is `5000`.
+* `accuracy`: Geo-fencing error range in meters. The default is `100`.
+* `loiteringDelayMs`: Sets the delay between `PolyGeofenceStatus.ENTER` and `PolyGeofenceStatus.DWELL` in milliseconds. The default is `300000`.
+* `allowMockLocations`: Whether to allow mock locations. The default is `false`.
+
+```dart
+final _polyGeofenceService = PolyGeofenceService.instance.setup(
+  interval: 5000,
+  accuracy: 100,
+  loiteringDelayMs: 60000,
+  allowMockLocations: false
+);
+```
+
+2. Create a `PolyGeofence` list. `PolyGeofence` provides the following parameters:
+* `id`: Identifier for `PolyGeofence`.
+* `data`: Custom data for `PolyGeofence`.
+* `polygon`: A list of coordinates to create a polygon. The polygon is always considered closed, regardless of whether the last point equals the first or not.
+
+```dart
+final _polyGeofenceList = <PolyGeofence>[
+  PolyGeofence(
+    id: 'Yongdusan_Park',
+    data: {
+      'address': '37-55 Yongdusan-gil, Gwangbokdong 2(i)-ga, Jung-gu, Busan',
+      'about': 'Mountain park known for its 129m-high observation tower, statues & stone monuments.'
+    },
+    polygon: <LatLng>[
+      LatLng(35.101727, 129.031665),
+      LatLng(35.101815, 129.033458),
+      LatLng(35.100032, 129.034055),
+      LatLng(35.099324, 129.033811),
+      LatLng(35.099906, 129.031927),
+      LatLng(35.101080, 129.031534)
+    ]
+  )
+];
+```
+
+3. Register a callback listener and call `PolyGeofenceService.instance.start()`.
+
+```dart
+Future<void> _onPolyGeofenceStatusChanged(
+    PolyGeofence polyGeofence,
+    PolyGeofenceStatus polyGeofenceStatus,
+    Position position) async {
+  dev.log('id: ${polyGeofence.id}');
+  dev.log('data: ${polyGeofence.data as Map}');
+  dev.log('status: $polyGeofenceStatus');
+  dev.log('timestamp: ${polyGeofence.timestamp}');
+  dev.log('passing position: ${position.toJson()}\n');
+  _polyGeofenceStreamController.sink.add(polyGeofence);
+}
+
+void _onError(dynamic error) {
+  final errorCode = getErrorCodesFromError(error);
+  if (errorCode == null) {
+    dev.log('Undefined error: $error');
+    return;
+  }
+
+  dev.log('ErrorCode: $errorCode');
+}
+
+@override
+void initState() {
+  super.initState();
+  WidgetsBinding.instance?.addPostFrameCallback((_) {
+    _polyGeofenceService.addPolyGeofenceStatusChangedListener(_onPolyGeofenceStatusChanged);
+    _polyGeofenceService.addStreamErrorListener(_onError);
+    _polyGeofenceService.start(_polyGeofenceList).catchError(_onError);
+  });
+}
+```
+
+4. Add `WillStartForegroundTask` widget for background execution on Android platform. `WillStartForegroundTask` provides the following options:
+* `onWillStart`: Called to ask if you want to start the foreground task.
+* `notificationOptions`: Optional values for notification detail settings.
+* `notificationTitle`: The title that will be displayed in the notification.
+* `notificationText`: The text that will be displayed in the notification.
+* `child`: A child widget that contains a `Scaffold` widget.
+
+```dart
+@override
+Widget build(BuildContext context) {
+  return MaterialApp(
+    // A widget used when you want to start a foreground task when trying to minimize or close the app.
+    // Declare on top of the [Scaffold] widget.
+    home: WillStartForegroundTask(
+      onWillStart: () {
+        // You can add a foreground task start condition.
+        return _polyGeofenceService.isRunningService;
+      },
+      notificationOptions: NotificationOptions(
+        channelId: 'geofence_service_notification_channel',
+        channelName: 'Geofence Service Notification',
+        channelDescription: 'Appears when the geofence service is running in the background.',
+        channelImportance: NotificationChannelImportance.LOW,
+        priority: NotificationPriority.LOW
+      ),
+      notificationTitle: 'Geofence Service is running',
+      notificationText: 'Tap to return to the app',
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Poly Geofence Service'),
+          centerTitle: true
+        ),
+        body: _buildContentView()
+      ),
+    ),
+  );
+}
+```
+
+5. To add or remove `PolyGeofence` while the service is running, use the following function:
+
+```
+_polyGeofenceService.addPolyGeofence(Model);
+_polyGeofenceService.addPolyGeofenceList(ModelList);
+_polyGeofenceService.removePolyGeofence(Model);
+_polyGeofenceService.removePolyGeofenceList(ModelList);
+_polyGeofenceService.removePolyGeofenceById(String);
+_polyGeofenceService.clearPolyGeofenceList();
+```
+
+6. When you are finished using the service, unregister a callback listener and call `PolyGeofenceService.instance.stop()`.
+
+```
+_polyGeofenceService.removePolyGeofenceStatusChangedListener(_onPolyGeofenceStatusChanged);
+_polyGeofenceService.removeStreamErrorListener(_onError);
+_polyGeofenceService.stop();
+```
+
+## Models
+
+### :chicken: LatLng
+
+A model representing the latitude and longitude of GPS.
+
+| Property | Description |
+|---|---|
+| `latitude` | The latitude of GPS. |
+| `longitude` | The longitude of GPS. |
+
+### :chicken: PolyGeofence
+
+A model representing a polygon geofence.
+
+| Property | Description |
+|---|---|
+| `id` | Identifier for `PolyGeofence`. |
+| `data` | Custom data for `PolyGeofence`. |
+| `polygon` | A list of coordinates to create a polygon. The polygon is always considered closed, regardless of whether the last point equals the first or not. |
+| `status` | The status of `PolyGeofence`. |
+| `timestamp` | The timestamp when polygon geofence status changes. |
+
+### :chicken: PolyGeofenceStatus
+
+Defines the status of the polygon geofence.
+
+| Value | Description |
+|---|---|
+| `ENTER` | Occurs when entering the geofence area. |
+| `EXIT` | Occurs when exiting the geofence area. |
+| `DWELL` | Occurs when the loitering delay elapses after entering the geofence area. |
+
+### :chicken: ErrorCodes
+
+Error codes that may occur in the service.
+
+| Value | Description |
+|---|---|
+| `ALREADY_STARTED` | Occurs when the service has already been started but the start function is called. |
+| `LOCATION_SERVICE_DISABLED` | Occurs when location service are disabled. When this error occurs, you should notify the user and request activation. |
+| `LOCATION_PERMISSION_DENIED` | Occurs when location permission is denied. |
+| `LOCATION_PERMISSION_PERMANENTLY_DENIED` | Occurs when location permission is permanently denied. In this case, the user must manually allow the permission. |
