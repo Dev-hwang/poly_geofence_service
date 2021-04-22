@@ -86,7 +86,7 @@ class _ExampleAppState extends State<ExampleApp> {
         notificationOptions: NotificationOptions(
           channelId: 'geofence_service_notification_channel',
           channelName: 'Geofence Service Notification',
-          channelDescription: 'Appears when the geofence service is running in the background.',
+          channelDescription: 'This notification appears when the geofence service is running in the background.',
           channelImportance: NotificationChannelImportance.LOW,
           priority: NotificationPriority.LOW
         ),

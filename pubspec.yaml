@@ -14,7 +14,7 @@ dependencies:
 
   geolocator: ^7.0.3
   vector_math: ^2.1.0
-  flutter_foreground_task: ^1.0.5
+  flutter_foreground_task: ^1.0.7
 
 dev_dependencies:
   flutter_test:

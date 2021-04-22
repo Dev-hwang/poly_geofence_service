@@ -154,7 +154,7 @@ void initState() {
 * `notificationOptions`: Optional values for notification detail settings.
 * `notificationTitle`: The title that will be displayed in the notification.
 * `notificationText`: The text that will be displayed in the notification.
-* `child`: A child widget that contains a `Scaffold` widget.
+* `child`: A child widget that contains the `Scaffold` widget.
 
 ```dart
 @override
@@ -170,7 +170,7 @@ Widget build(BuildContext context) {
       notificationOptions: NotificationOptions(
         channelId: 'geofence_service_notification_channel',
         channelName: 'Geofence Service Notification',
-        channelDescription: 'Appears when the geofence service is running in the background.',
+        channelDescription: 'This notification appears when the geofence service is running in the background.',
         channelImportance: NotificationChannelImportance.LOW,
         priority: NotificationPriority.LOW
       ),
