@@ -250,3 +250,7 @@ Error codes that may occur in the service.
 | `LOCATION_SERVICE_DISABLED` | Occurs when location service are disabled. When this error occurs, you should notify the user and request activation. |
 | `LOCATION_PERMISSION_DENIED` | Occurs when location permission is denied. |
 | `LOCATION_PERMISSION_PERMANENTLY_DENIED` | Occurs when location permission is permanently denied. In this case, the user must manually allow the permission. |
+
+## Support
+
+If you find any bugs or issues while using the plugin, please register an issues on [GitHub](https://github.com/Dev-hwang/poly_geofence_service/issues). You can also contact us at <hwj930513@naver.com>.
