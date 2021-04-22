@@ -77,6 +77,7 @@ If you want to run the service in the background, add the following permissions.
 * `interval`: The time interval in milliseconds to check the polygon geofence status. The default is `5000`.
 * `accuracy`: Geo-fencing error range in meters. The default is `100`.
 * `loiteringDelayMs`: Sets the delay between `PolyGeofenceStatus.ENTER` and `PolyGeofenceStatus.DWELL` in milliseconds. The default is `300000`.
+* `statusChangeDelayMs`: Sets the status change delay in milliseconds. `PolyGeofenceStatus.ENTER` and `PolyGeofenceStatus.EXIT` events may be called frequently when the location is near the boundary of the polygon geofence. Use this option to minimize event calls at this time. If the option value is too large, realtime geo-fencing is not possible, so use it carefully. The default is `10000`.
 * `allowMockLocations`: Whether to allow mock locations. The default is `false`.
 
 ```dart
@@ -84,6 +85,7 @@ final _polyGeofenceService = PolyGeofenceService.instance.setup(
   interval: 5000,
   accuracy: 100,
   loiteringDelayMs: 60000,
+  statusChangeDelayMs: 10000,
   allowMockLocations: false
 );
 ```

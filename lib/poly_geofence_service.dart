@@ -48,6 +48,13 @@ class PolyGeofenceService {
   /// The default is `300000`.
   int _loiteringDelayMs = 300000;
 
+  /// Sets the status change delay in milliseconds.
+  /// [PolyGeofenceStatus.ENTER] and [PolyGeofenceStatus.EXIT] events may be called frequently
+  /// when the location is near the boundary of the polygon geofence. Use this option to minimize event calls at this time.
+  /// If the option value is too large, realtime geo-fencing is not possible, so use it carefully.
+  /// The default is `10000`.
+  int _statusChangeDelayMs = 10000;
+
   /// Whether to allow mock locations.
   /// The default is `false`.
   bool _allowMockLocations = false;
@@ -63,11 +70,13 @@ class PolyGeofenceService {
     int? interval,
     int? accuracy,
     int? loiteringDelayMs,
+    int? statusChangeDelayMs,
     bool? allowMockLocations
   }) {
     _interval = interval ?? _interval;
     _accuracy = accuracy ?? _accuracy;
     _loiteringDelayMs = loiteringDelayMs ?? _loiteringDelayMs;
+    _statusChangeDelayMs = statusChangeDelayMs ?? _statusChangeDelayMs;
     _allowMockLocations = allowMockLocations ?? _allowMockLocations;
 
     return this;
@@ -205,28 +214,30 @@ class PolyGeofenceService {
 
     PolyGeofence polyGeofence;
     PolyGeofenceStatus polyGeofenceStatus;
-    final nowDateTime = DateTime.now();
+    final currTimestamp = position.timestamp ?? DateTime.now();
+    DateTime? polyTimestamp;
     Duration diffTimestamp;
     for (int i = 0; i < _polyGeofenceList.length; i++) {
       polyGeofence = _polyGeofenceList[i];
+
+      polyTimestamp = polyGeofence.timestamp;
+      diffTimestamp = currTimestamp.difference(polyTimestamp ?? currTimestamp);
 
       if (PolyUtils.containsLocation(
           position.latitude, position.longitude, polyGeofence.polygon)) {
         polyGeofenceStatus = PolyGeofenceStatus.ENTER;
 
-        if (polyGeofence.status == PolyGeofenceStatus.ENTER) {
-          diffTimestamp = nowDateTime.difference(
-              polyGeofence.timestamp ?? nowDateTime);
-
-          if (diffTimestamp.inMilliseconds > _loiteringDelayMs)
-            polyGeofenceStatus = PolyGeofenceStatus.DWELL;
-        } else if (polyGeofence.status == PolyGeofenceStatus.DWELL) {
+        if ((diffTimestamp.inMilliseconds > _loiteringDelayMs
+            && polyGeofence.status == PolyGeofenceStatus.ENTER)
+            || polyGeofence.status == PolyGeofenceStatus.DWELL) {
           polyGeofenceStatus = PolyGeofenceStatus.DWELL;
         }
       } else {
         polyGeofenceStatus = PolyGeofenceStatus.EXIT;
       }
 
+      if (polyTimestamp != null
+          && diffTimestamp.inMilliseconds < _statusChangeDelayMs) continue;
       if (!polyGeofence.updateStatus(polyGeofenceStatus, position)) continue;
 
       for (final listener in _polyGeofenceStatusChangedListeners)

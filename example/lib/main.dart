@@ -19,6 +19,7 @@ class _ExampleAppState extends State<ExampleApp> {
     interval: 5000,
     accuracy: 100,
     loiteringDelayMs: 60000,
+    statusChangeDelayMs: 10000,
     allowMockLocations: false
   );
 
