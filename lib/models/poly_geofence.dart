@@ -36,7 +36,7 @@ class PolyGeofence {
     return {
       'id': id,
       'data': data,
-      'polygon': polygon.map((e) => e.toMap()).toString(),
+      'polygon': polygon.map((e) => e.toMap()).toList(),
       'status': _status,
       'timestamp': _timestamp
     };
