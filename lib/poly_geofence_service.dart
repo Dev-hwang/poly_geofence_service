@@ -66,13 +66,12 @@ class PolyGeofenceService {
 
   /// Setup [PolyGeofenceService].
   /// Some options do not change while the service is running.
-  PolyGeofenceService setup({
-    int? interval,
-    int? accuracy,
-    int? loiteringDelayMs,
-    int? statusChangeDelayMs,
-    bool? allowMockLocations
-  }) {
+  PolyGeofenceService setup(
+      {int? interval,
+      int? accuracy,
+      int? loiteringDelayMs,
+      int? statusChangeDelayMs,
+      bool? allowMockLocations}) {
     _interval = interval ?? _interval;
     _accuracy = accuracy ?? _accuracy;
     _loiteringDelayMs = loiteringDelayMs ?? _loiteringDelayMs;
@@ -227,17 +226,17 @@ class PolyGeofenceService {
           position.latitude, position.longitude, polyGeofence.polygon)) {
         polyGeofenceStatus = PolyGeofenceStatus.ENTER;
 
-        if ((diffTimestamp.inMilliseconds > _loiteringDelayMs
-            && polyGeofence.status == PolyGeofenceStatus.ENTER)
-            || polyGeofence.status == PolyGeofenceStatus.DWELL) {
+        if ((diffTimestamp.inMilliseconds > _loiteringDelayMs &&
+                polyGeofence.status == PolyGeofenceStatus.ENTER) ||
+            polyGeofence.status == PolyGeofenceStatus.DWELL) {
           polyGeofenceStatus = PolyGeofenceStatus.DWELL;
         }
       } else {
         polyGeofenceStatus = PolyGeofenceStatus.EXIT;
       }
 
-      if (polyTimestamp != null
-          && diffTimestamp.inMilliseconds < _statusChangeDelayMs) continue;
+      if (polyTimestamp != null &&
+          diffTimestamp.inMilliseconds < _statusChangeDelayMs) continue;
       if (!polyGeofence.updateStatus(polyGeofenceStatus, position)) continue;
 
       for (final listener in _polyGeofenceStatusChangedListeners)

@@ -11,9 +11,6 @@ class LatLng {
 
   /// Returns the data fields of [PolyGeofence] in [Map] format.
   Map<String, dynamic> toMap() {
-    return {
-      'latitude': latitude,
-      'longitude': longitude
-    };
+    return {'latitude': latitude, 'longitude': longitude};
   }
 }
