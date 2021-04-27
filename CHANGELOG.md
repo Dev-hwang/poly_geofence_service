@@ -1,3 +1,7 @@
+## 1.0.2
+
+* Fix an issue where PolyGeofence toMap function did not work properly.
+
 ## 1.0.1
 
 * Updates README.md
