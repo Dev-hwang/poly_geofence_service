@@ -1,3 +1,7 @@
+## 1.0.3
+
+* Upgrade flutter_foreground_task: ^1.0.8
+
 ## 1.0.2
 
 * Fix an issue where PolyGeofence toMap function did not work properly.
