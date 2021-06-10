@@ -62,6 +62,7 @@ class PolyGeofenceService {
   StreamSubscription<Position>? _positionStream;
   final _polyGeofenceList = <PolyGeofence>[];
   final _polyGeofenceStatusChangedListeners = <PolyGeofenceStatusChanged>[];
+  final _positionChangedListeners = <ValueChanged<Position>>[];
   final _streamErrorListeners = <ValueChanged>[];
 
   /// Setup [PolyGeofenceService].
@@ -128,6 +129,17 @@ class PolyGeofenceService {
   void removePolyGeofenceStatusChangedListener(
       PolyGeofenceStatusChanged listener) {
     _polyGeofenceStatusChangedListeners.remove(listener);
+  }
+
+  /// Register a closure to be called when the [Position] changes.
+  void addPositionChangedListener(ValueChanged<Position> listener) {
+    _positionChangedListeners.add(listener);
+  }
+
+  /// Remove a previously registered closure from the list of closures that
+  /// are notified when the [Position] changes.
+  void removePositionChangedListener(ValueChanged<Position> listener) {
+    _positionChangedListeners.remove(listener);
   }
 
   /// Register a closure to be called when a stream error occurs.
@@ -207,6 +219,8 @@ class PolyGeofenceService {
   void _onPositionReceive(Position position) async {
     if (!_allowMockLocations && position.isMocked) return;
     if (position.accuracy > _accuracy) return;
+
+    for (final listener in _positionChangedListeners) listener(position);
 
     // Pause the service and process the position.
     pause();

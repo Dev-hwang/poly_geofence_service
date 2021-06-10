@@ -118,6 +118,8 @@ final _polyGeofenceList = <PolyGeofence>[
 3. Register a callback listener and call `PolyGeofenceService.instance.start()`.
 
 ```dart
+import 'dart:developer' as dev;
+
 Future<void> _onPolyGeofenceStatusChanged(
     PolyGeofence polyGeofence,
     PolyGeofenceStatus polyGeofenceStatus,
@@ -126,8 +128,11 @@ Future<void> _onPolyGeofenceStatusChanged(
   dev.log('data: ${polyGeofence.data as Map}');
   dev.log('status: $polyGeofenceStatus');
   dev.log('timestamp: ${polyGeofence.timestamp}');
-  dev.log('passing position: ${position.toJson()}\n');
-  _polyGeofenceStreamController.sink.add(polyGeofence);
+  dev.log('passing position: ${position.toJson()}');
+}
+
+void _onPositionChanged(Position position) {
+  dev.log('position: ${position.toJson()}');
 }
 
 void _onError(dynamic error) {
@@ -145,6 +150,7 @@ void initState() {
   super.initState();
   WidgetsBinding.instance?.addPostFrameCallback((_) {
     _polyGeofenceService.addPolyGeofenceStatusChangedListener(_onPolyGeofenceStatusChanged);
+    _polyGeofenceService.addPositionChangedListener(_onPositionChanged);
     _polyGeofenceService.addStreamErrorListener(_onError);
     _polyGeofenceService.start(_polyGeofenceList).catchError(_onError);
   });
@@ -192,7 +198,7 @@ Widget build(BuildContext context) {
 
 5. To add or remove `PolyGeofence` while the service is running, use the following function:
 
-```
+```text
 _polyGeofenceService.addPolyGeofence(Model);
 _polyGeofenceService.addPolyGeofenceList(ModelList);
 _polyGeofenceService.removePolyGeofence(Model);
@@ -203,8 +209,9 @@ _polyGeofenceService.clearPolyGeofenceList();
 
 6. When you are finished using the service, unregister a callback listener and call `PolyGeofenceService.instance.stop()`.
 
-```
+```text
 _polyGeofenceService.removePolyGeofenceStatusChangedListener(_onPolyGeofenceStatusChanged);
+_polyGeofenceService.removePositionChangedListener(_onPositionChanged);
 _polyGeofenceService.removeStreamErrorListener(_onError);
 _polyGeofenceService.stop();
 ```

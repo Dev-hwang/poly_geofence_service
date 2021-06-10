@@ -50,8 +50,12 @@ class _ExampleAppState extends State<ExampleApp> {
     dev.log('data: ${polyGeofence.data as Map}');
     dev.log('status: $polyGeofenceStatus');
     dev.log('timestamp: ${polyGeofence.timestamp}');
-    dev.log('passing position: ${position.toJson()}\n');
+    dev.log('passing position: ${position.toJson()}');
     _polyGeofenceStreamController.sink.add(polyGeofence);
+  }
+
+  void _onPositionChanged(Position position) {
+    dev.log('position: ${position.toJson()}');
   }
 
   void _onError(dynamic error) {
@@ -69,6 +73,7 @@ class _ExampleAppState extends State<ExampleApp> {
     super.initState();
     WidgetsBinding.instance?.addPostFrameCallback((_) {
       _polyGeofenceService.addPolyGeofenceStatusChangedListener(_onPolyGeofenceStatusChanged);
+      _polyGeofenceService.addPositionChangedListener(_onPositionChanged);
       _polyGeofenceService.addStreamErrorListener(_onError);
       _polyGeofenceService.start(_polyGeofenceList).catchError(_onError);
     });
