@@ -90,13 +90,13 @@ If you want to run the service in the background, add the following permissions.
 * `allowMockLocations`: Whether to allow mock locations. The default is `false`.
 
 ```dart
+// Create a [PolyGeofenceService] instance and set options.
 final _polyGeofenceService = PolyGeofenceService.instance.setup(
-  interval: 5000,
-  accuracy: 100,
-  loiteringDelayMs: 60000,
-  statusChangeDelayMs: 10000,
-  allowMockLocations: false
-);
+    interval: 5000,
+    accuracy: 100,
+    loiteringDelayMs: 60000,
+    statusChangeDelayMs: 10000,
+    allowMockLocations: false);
 ```
 
 ### 2. Create a `PolyGeofence` list. `PolyGeofence` provides the following parameters:
@@ -105,6 +105,7 @@ final _polyGeofenceService = PolyGeofenceService.instance.setup(
 * `polygon`: A list of coordinates to create a polygon. The polygon is always considered closed, regardless of whether the last point equals the first or not.
 
 ```dart
+// Create a [PolyGeofence] list.
 final _polyGeofenceList = <PolyGeofence>[
   PolyGeofence(
     id: 'Yongdusan_Park',
@@ -113,14 +114,14 @@ final _polyGeofenceList = <PolyGeofence>[
       'about': 'Mountain park known for its 129m-high observation tower, statues & stone monuments.'
     },
     polygon: <LatLng>[
-      LatLng(35.101727, 129.031665),
-      LatLng(35.101815, 129.033458),
-      LatLng(35.100032, 129.034055),
-      LatLng(35.099324, 129.033811),
-      LatLng(35.099906, 129.031927),
-      LatLng(35.101080, 129.031534)
-    ]
-  )
+      const LatLng(35.101727, 129.031665),
+      const LatLng(35.101815, 129.033458),
+      const LatLng(35.100032, 129.034055),
+      const LatLng(35.099324, 129.033811),
+      const LatLng(35.099906, 129.031927),
+      const LatLng(35.101080, 129.031534)
+    ],
+  ),
 ];
 ```
 
@@ -129,25 +130,27 @@ final _polyGeofenceList = <PolyGeofence>[
 ```dart
 import 'dart:developer' as dev;
 
+// This function is to be called when the geofence state is changed.
 Future<void> _onPolyGeofenceStatusChanged(
     PolyGeofence polyGeofence,
     PolyGeofenceStatus polyGeofenceStatus,
     Position position) async {
-  dev.log('id: ${polyGeofence.id}');
-  dev.log('data: ${polyGeofence.data as Map}');
-  dev.log('status: $polyGeofenceStatus');
-  dev.log('timestamp: ${polyGeofence.timestamp}');
-  dev.log('passing position: ${position.toJson()}');
+  dev.log('geofence: ${polyGeofence.toJson()}');
+  dev.log('position: ${position.toJson()}');
 }
 
+// This function is to be called when the position has changed.
 void _onPositionChanged(Position position) {
   dev.log('position: ${position.toJson()}');
 }
 
+// This function is to be called when a location service status change occurs
+// since the service was started.
 void _onLocationServiceStatusChanged(bool status) {
   dev.log('location service status: $status');
 }
 
+// This function is used to handle errors that occur in the service.
 void _onError(error) {
   final errorCode = getErrorCodesFromError(error);
   if (errorCode == null) {
