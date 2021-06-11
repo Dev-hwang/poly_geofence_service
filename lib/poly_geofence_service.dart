@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:developer' as dev;
+// import 'dart:developer' as dev;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:poly_geofence_service/models/error_codes.dart';
 import 'package:poly_geofence_service/models/poly_geofence.dart';
+import 'package:poly_geofence_service/models/poly_geofence_service_options.dart';
 import 'package:poly_geofence_service/models/poly_geofence_status.dart';
 import 'package:poly_geofence_service/utils/poly_utils.dart';
 
@@ -15,6 +16,7 @@ export 'package:geolocator/geolocator.dart';
 export 'package:poly_geofence_service/models/error_codes.dart';
 export 'package:poly_geofence_service/models/lat_lng.dart';
 export 'package:poly_geofence_service/models/poly_geofence.dart';
+export 'package:poly_geofence_service/models/poly_geofence_service_options.dart';
 export 'package:poly_geofence_service/models/poly_geofence_status.dart';
 export 'package:poly_geofence_service/utils/poly_utils.dart';
 
@@ -37,34 +39,14 @@ class PolyGeofenceService {
   /// Returns whether the service is running.
   bool get isRunningService => _isRunningService;
 
-  /// The time interval in milliseconds to check the polygon geofence status.
-  /// The default is `5000`.
-  int _interval = 5000;
-
-  /// Geo-fencing error range in meters.
-  /// The default is `100`.
-  int _accuracy = 100;
-
-  /// Sets the delay between [PolyGeofenceStatus.ENTER] and [PolyGeofenceStatus.DWELL] in milliseconds.
-  /// The default is `300000`.
-  int _loiteringDelayMs = 300000;
-
-  /// Sets the status change delay in milliseconds.
-  /// [PolyGeofenceStatus.ENTER] and [PolyGeofenceStatus.EXIT] events may be called frequently
-  /// when the location is near the boundary of the polygon geofence. Use this option to minimize event calls at this time.
-  /// If the option value is too large, realtime geo-fencing is not possible, so use it carefully.
-  /// The default is `10000`.
-  int _statusChangeDelayMs = 10000;
-
-  /// Whether to allow mock locations.
-  /// The default is `false`.
-  bool _allowMockLocations = false;
+  final _options = PolyGeofenceServiceOptions();
 
   final _locationServiceStatusChangeEventChannel =
       const EventChannel('poly_geofence_service/location_service_status');
 
   StreamSubscription<Position>? _positionStream;
   StreamSubscription<bool>? _locationServiceStatusStream;
+
   final _polyGeofenceList = <PolyGeofence>[];
   final _polyGeofenceStatusChangedListeners = <PolyGeofenceStatusChanged>[];
   final _positionChangedListeners = <ValueChanged<Position>>[];
@@ -79,11 +61,11 @@ class PolyGeofenceService {
       int? loiteringDelayMs,
       int? statusChangeDelayMs,
       bool? allowMockLocations}) {
-    _interval = interval ?? _interval;
-    _accuracy = accuracy ?? _accuracy;
-    _loiteringDelayMs = loiteringDelayMs ?? _loiteringDelayMs;
-    _statusChangeDelayMs = statusChangeDelayMs ?? _statusChangeDelayMs;
-    _allowMockLocations = allowMockLocations ?? _allowMockLocations;
+    _options.interval = interval;
+    _options.accuracy = accuracy;
+    _options.loiteringDelayMs = loiteringDelayMs;
+    _options.statusChangeDelayMs = statusChangeDelayMs;
+    _options.allowMockLocations = allowMockLocations;
 
     return this;
   }
@@ -99,7 +81,7 @@ class PolyGeofenceService {
     if (polyGeofenceList != null) _polyGeofenceList.addAll(polyGeofenceList);
 
     _isRunningService = true;
-    if (!kReleaseMode) dev.log('PolyGeofenceService started.');
+    // if (!kReleaseMode) dev.log('PolyGeofenceService started.');
   }
 
   /// Stop [PolyGeofenceService].
@@ -109,7 +91,7 @@ class PolyGeofenceService {
     _polyGeofenceList.clear();
 
     _isRunningService = false;
-    if (!kReleaseMode) dev.log('PolyGeofenceService stopped.');
+    // if (!kReleaseMode) dev.log('PolyGeofenceService stopped.');
   }
 
   /// Pause [PolyGeofenceService].
@@ -223,7 +205,7 @@ class PolyGeofenceService {
   Future<void> _listenStream() async {
     _positionStream = Geolocator.getPositionStream(
             desiredAccuracy: LocationAccuracy.best,
-            intervalDuration: Duration(milliseconds: _interval))
+            intervalDuration: Duration(milliseconds: _options.interval))
         .handleError(_handleStreamError)
         .listen(_onPositionReceive);
 
@@ -242,8 +224,8 @@ class PolyGeofenceService {
   }
 
   void _onPositionReceive(Position position) async {
-    if (!_allowMockLocations && position.isMocked) return;
-    if (position.accuracy > _accuracy) return;
+    if (position.isMocked && !_options.allowMockLocations) return;
+    if (position.accuracy > _options.accuracy) return;
 
     for (final listener in _positionChangedListeners) listener(position);
 
@@ -265,7 +247,7 @@ class PolyGeofenceService {
           position.latitude, position.longitude, polyGeofence.polygon)) {
         polyGeofenceStatus = PolyGeofenceStatus.ENTER;
 
-        if ((diffTimestamp.inMilliseconds > _loiteringDelayMs &&
+        if ((diffTimestamp.inMilliseconds > _options.loiteringDelayMs &&
                 polyGeofence.status == PolyGeofenceStatus.ENTER) ||
             polyGeofence.status == PolyGeofenceStatus.DWELL) {
           polyGeofenceStatus = PolyGeofenceStatus.DWELL;
@@ -275,7 +257,7 @@ class PolyGeofenceService {
       }
 
       if (polyTimestamp != null &&
-          diffTimestamp.inMilliseconds < _statusChangeDelayMs) continue;
+          diffTimestamp.inMilliseconds < _options.statusChangeDelayMs) continue;
       if (!polyGeofence.updateStatus(polyGeofenceStatus, position)) continue;
 
       for (final listener in _polyGeofenceStatusChangedListeners)
