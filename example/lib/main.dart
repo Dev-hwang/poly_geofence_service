@@ -125,7 +125,7 @@ class _ExampleAppState extends State<ExampleApp> {
       stream: _polyGeofenceStreamController.stream,
       builder: (context, snapshot) {
         final updatedDateTime = DateTime.now();
-        final content = snapshot.data?.toMap().toString() ?? '';
+        final content = snapshot.data?.toJson().toString() ?? '';
 
         return ListView(
           physics: const BouncingScrollPhysics(),

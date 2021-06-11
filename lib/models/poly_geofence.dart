@@ -31,12 +31,12 @@ class PolyGeofence {
       : assert(id.isNotEmpty),
         assert(polygon.isNotEmpty);
 
-  /// Returns the data fields of [PolyGeofence] in [Map] format.
-  Map<String, dynamic> toMap() {
+  /// Returns the data fields of [PolyGeofence] in JSON format.
+  Map<String, dynamic> toJson() {
     return {
       'id': id,
       'data': data,
-      'polygon': polygon.map((e) => e.toMap()).toList(),
+      'polygon': polygon.map((e) => e.toJson()).toList(),
       'status': _status,
       'timestamp': _timestamp
     };

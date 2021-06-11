@@ -9,8 +9,7 @@ class LatLng {
   /// Constructs an instance of [LatLng].
   const LatLng(this.latitude, this.longitude);
 
-  /// Returns the data fields of [PolyGeofence] in [Map] format.
-  Map<String, dynamic> toMap() {
-    return {'latitude': latitude, 'longitude': longitude};
-  }
+  /// Returns the data fields of [PolyGeofence] in JSON format.
+  Map<String, dynamic> toJson() =>
+      {'latitude': latitude, 'longitude': longitude};
 }
