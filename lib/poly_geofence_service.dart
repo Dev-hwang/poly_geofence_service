@@ -3,6 +3,7 @@ import 'dart:developer' as dev;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:poly_geofence_service/models/error_codes.dart';
 import 'package:poly_geofence_service/models/poly_geofence.dart';
@@ -59,10 +60,15 @@ class PolyGeofenceService {
   /// The default is `false`.
   bool _allowMockLocations = false;
 
+  final _locationServiceStatusChangeEventChannel =
+      const EventChannel('poly_geofence_service/location_service_status');
+
   StreamSubscription<Position>? _positionStream;
+  StreamSubscription<bool>? _locationServiceStatusStream;
   final _polyGeofenceList = <PolyGeofence>[];
   final _polyGeofenceStatusChangedListeners = <PolyGeofenceStatusChanged>[];
   final _positionChangedListeners = <ValueChanged<Position>>[];
+  final _locationServiceStatusChangedListeners = <ValueChanged<bool>>[];
   final _streamErrorListeners = <ValueChanged>[];
 
   /// Setup [PolyGeofenceService].
@@ -142,6 +148,17 @@ class PolyGeofenceService {
     _positionChangedListeners.remove(listener);
   }
 
+  /// Register a closure to be called when the location service status changes.
+  void addLocationServiceStatusChangedListener(ValueChanged<bool> listener) {
+    _locationServiceStatusChangedListeners.add(listener);
+  }
+
+  /// Remove a previously registered closure from the list of closures that
+  /// are notified when the location service status changes.
+  void removeLocationServiceStatusChangedListener(ValueChanged<bool> listener) {
+    _locationServiceStatusChangedListeners.remove(listener);
+  }
+
   /// Register a closure to be called when a stream error occurs.
   void addStreamErrorListener(ValueChanged listener) {
     _streamErrorListeners.add(listener);
@@ -209,11 +226,19 @@ class PolyGeofenceService {
             intervalDuration: Duration(milliseconds: _interval))
         .handleError(_handleStreamError)
         .listen(_onPositionReceive);
+
+    _locationServiceStatusStream = _locationServiceStatusChangeEventChannel
+        .receiveBroadcastStream()
+        .map((event) => event == true)
+        .listen(_onLocationServiceStatusChange);
   }
 
   Future<void> _cancelStream() async {
     await _positionStream?.cancel();
     _positionStream = null;
+
+    await _locationServiceStatusStream?.cancel();
+    _locationServiceStatusStream = null;
   }
 
   void _onPositionReceive(Position position) async {
@@ -262,7 +287,12 @@ class PolyGeofenceService {
     resume();
   }
 
-  void _handleStreamError(dynamic error) {
+  void _onLocationServiceStatusChange(bool status) {
+    for (final listener in _locationServiceStatusChangedListeners)
+      listener(status);
+  }
+
+  void _handleStreamError(error) {
     for (final listener in _streamErrorListeners) listener(error);
   }
 }

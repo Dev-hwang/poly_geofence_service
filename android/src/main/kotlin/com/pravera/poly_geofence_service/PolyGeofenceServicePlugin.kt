@@ -3,34 +3,45 @@ package com.pravera.poly_geofence_service
 import androidx.annotation.NonNull
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
-import io.flutter.plugin.common.MethodCall
-import io.flutter.plugin.common.MethodChannel
-import io.flutter.plugin.common.MethodChannel.MethodCallHandler
-import io.flutter.plugin.common.MethodChannel.Result
-import io.flutter.plugin.common.PluginRegistry.Registrar
+import io.flutter.embedding.engine.plugins.activity.ActivityAware
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 
 /** PolyGeofenceServicePlugin */
-class PolyGeofenceServicePlugin: FlutterPlugin, MethodCallHandler {
-  /// The MethodChannel that will the communication between Flutter and native Android
-  ///
-  /// This local reference serves to register the plugin with the Flutter Engine and unregister it
-  /// when the Flutter Engine is detached from the Activity
-  private lateinit var channel : MethodChannel
+class PolyGeofenceServicePlugin: FlutterPlugin, ActivityAware {
+  private lateinit var methodCallHandler: MethodCallHandlerImpl
+  private lateinit var locationServiceStatusStreamHandler: LocationServiceStatusStreamHandlerImpl
 
-  override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-    channel = MethodChannel(flutterPluginBinding.binaryMessenger, "poly_geofence_service")
-    channel.setMethodCallHandler(this)
-  }
+  override fun onAttachedToEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
+    methodCallHandler = MethodCallHandlerImpl()
+    methodCallHandler.startListening(binding.binaryMessenger)
 
-  override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
-    if (call.method == "getPlatformVersion") {
-      result.success("Android ${android.os.Build.VERSION.RELEASE}")
-    } else {
-      result.notImplemented()
-    }
+    locationServiceStatusStreamHandler = LocationServiceStatusStreamHandlerImpl()
+    locationServiceStatusStreamHandler.startListening(binding.binaryMessenger)
   }
 
   override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
-    channel.setMethodCallHandler(null)
+    if (::methodCallHandler.isInitialized)
+      methodCallHandler.stopListening()
+
+    if (::locationServiceStatusStreamHandler.isInitialized)
+      locationServiceStatusStreamHandler.stopListening()
+  }
+
+  override fun onAttachedToActivity(binding: ActivityPluginBinding) {
+    methodCallHandler.setActivity(binding.activity)
+    locationServiceStatusStreamHandler.setActivity(binding.activity)
+  }
+
+  override fun onDetachedFromActivityForConfigChanges() {
+    onDetachedFromActivity()
+  }
+
+  override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
+    onAttachedToActivity(binding)
+  }
+
+  override fun onDetachedFromActivity() {
+    methodCallHandler.setActivity(null)
+    locationServiceStatusStreamHandler.setActivity(null)
   }
 }

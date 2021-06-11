@@ -2,13 +2,16 @@ import Flutter
 import UIKit
 
 public class SwiftPolyGeofenceServicePlugin: NSObject, FlutterPlugin {
+  private var methodCallHandler: MethodCallHandlerImpl? = nil
+  private var locationServiceStatusStreamHandler: LocationServiceStatusStreamHandlerImpl? = nil
+  
   public static func register(with registrar: FlutterPluginRegistrar) {
-    let channel = FlutterMethodChannel(name: "poly_geofence_service", binaryMessenger: registrar.messenger())
     let instance = SwiftPolyGeofenceServicePlugin()
-    registrar.addMethodCallDelegate(instance, channel: channel)
+    instance.setupChannels(registrar.messenger())
   }
 
-  public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-    result("iOS " + UIDevice.current.systemVersion)
+  private func setupChannels(_ messenger: FlutterBinaryMessenger) {
+    methodCallHandler = MethodCallHandlerImpl(messenger: messenger)
+    locationServiceStatusStreamHandler = LocationServiceStatusStreamHandlerImpl(messenger: messenger)
   }
 }

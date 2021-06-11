@@ -33,6 +33,15 @@ Since geo-fencing operates based on location, we need to add the following permi
 <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 ```
 
+And specify the service inside the `<application>` tag as follows.
+
+```
+<service
+    android:name="com.pravera.poly_geofence_service.service.LocationProviderIntentService"
+    android:permission="android.permission.BIND_JOB_SERVICE"
+    android:stopWithTask="true" />
+```
+
 In addition, if you want to run the service in the background, add the following permission. If your project supports Android 10, be sure to add the `ACCESS_BACKGROUND_LOCATION` permission.
 
 ```
@@ -73,7 +82,7 @@ If you want to run the service in the background, add the following permissions.
 
 ## How to use
 
-1. Create a `PolyGeofenceService` instance and set options. `PolyGeofenceService.instance.setup()` provides the following options:
+### 1. Create a `PolyGeofenceService` instance and set options. `PolyGeofenceService.instance.setup()` provides the following options:
 * `interval`: The time interval in milliseconds to check the polygon geofence status. The default is `5000`.
 * `accuracy`: Geo-fencing error range in meters. The default is `100`.
 * `loiteringDelayMs`: Sets the delay between `PolyGeofenceStatus.ENTER` and `PolyGeofenceStatus.DWELL` in milliseconds. The default is `300000`.
@@ -90,7 +99,7 @@ final _polyGeofenceService = PolyGeofenceService.instance.setup(
 );
 ```
 
-2. Create a `PolyGeofence` list. `PolyGeofence` provides the following parameters:
+### 2. Create a `PolyGeofence` list. `PolyGeofence` provides the following parameters:
 * `id`: Identifier for `PolyGeofence`.
 * `data`: Custom data for `PolyGeofence`.
 * `polygon`: A list of coordinates to create a polygon. The polygon is always considered closed, regardless of whether the last point equals the first or not.
@@ -115,7 +124,7 @@ final _polyGeofenceList = <PolyGeofence>[
 ];
 ```
 
-3. Register a callback listener and call `PolyGeofenceService.instance.start()`.
+### 3. Register a listener and call `PolyGeofenceService.instance.start()`.
 
 ```dart
 import 'dart:developer' as dev;
@@ -135,7 +144,11 @@ void _onPositionChanged(Position position) {
   dev.log('position: ${position.toJson()}');
 }
 
-void _onError(dynamic error) {
+void _onLocationServiceStatusChanged(bool status) {
+  dev.log('location service status: $status');
+}
+
+void _onError(error) {
   final errorCode = getErrorCodesFromError(error);
   if (errorCode == null) {
     dev.log('Undefined error: $error');
@@ -151,13 +164,14 @@ void initState() {
   WidgetsBinding.instance?.addPostFrameCallback((_) {
     _polyGeofenceService.addPolyGeofenceStatusChangedListener(_onPolyGeofenceStatusChanged);
     _polyGeofenceService.addPositionChangedListener(_onPositionChanged);
+    _polyGeofenceService.addLocationServiceStatusChangedListener(_onLocationServiceStatusChanged);
     _polyGeofenceService.addStreamErrorListener(_onError);
     _polyGeofenceService.start(_polyGeofenceList).catchError(_onError);
   });
 }
 ```
 
-4. Add `WillStartForegroundTask` widget for background execution on Android platform. `WillStartForegroundTask` provides the following options:
+### 4. Add `WillStartForegroundTask` widget for background execution on Android platform. `WillStartForegroundTask` provides the following options:
 * `onWillStart`: Called to ask if you want to start the foreground task.
 * `notificationOptions`: Optional values for notification detail settings.
 * `notificationTitle`: The title that will be displayed in the notification.
@@ -196,7 +210,7 @@ Widget build(BuildContext context) {
 }
 ```
 
-5. To add or remove `PolyGeofence` while the service is running, use the following function:
+### 5. To add or remove `PolyGeofence` while the service is running, use the following function:
 
 ```text
 _polyGeofenceService.addPolyGeofence(Model);
@@ -207,11 +221,12 @@ _polyGeofenceService.removePolyGeofenceById(String);
 _polyGeofenceService.clearPolyGeofenceList();
 ```
 
-6. When you are finished using the service, unregister a callback listener and call `PolyGeofenceService.instance.stop()`.
+### 6. When you are finished using the service, unregister a callback listener and call `PolyGeofenceService.instance.stop()`.
 
 ```text
 _polyGeofenceService.removePolyGeofenceStatusChangedListener(_onPolyGeofenceStatusChanged);
 _polyGeofenceService.removePositionChangedListener(_onPositionChanged);
+_polyGeofenceService.removeLocationServiceStatusChangedListener(_onLocationServiceStatusChanged);
 _polyGeofenceService.removeStreamErrorListener(_onError);
 _polyGeofenceService.stop();
 ```

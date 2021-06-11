@@ -58,7 +58,11 @@ class _ExampleAppState extends State<ExampleApp> {
     dev.log('position: ${position.toJson()}');
   }
 
-  void _onError(dynamic error) {
+  void _onLocationServiceStatusChanged(bool status) {
+    dev.log('location service status: $status');
+  }
+
+  void _onError(error) {
     final errorCode = getErrorCodesFromError(error);
     if (errorCode == null) {
       dev.log('Undefined error: $error');
@@ -74,6 +78,7 @@ class _ExampleAppState extends State<ExampleApp> {
     WidgetsBinding.instance?.addPostFrameCallback((_) {
       _polyGeofenceService.addPolyGeofenceStatusChangedListener(_onPolyGeofenceStatusChanged);
       _polyGeofenceService.addPositionChangedListener(_onPositionChanged);
+      _polyGeofenceService.addLocationServiceStatusChangedListener(_onLocationServiceStatusChanged);
       _polyGeofenceService.addStreamErrorListener(_onError);
       _polyGeofenceService.start(_polyGeofenceList).catchError(_onError);
     });
