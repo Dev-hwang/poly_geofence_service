@@ -1,3 +1,24 @@
+## 1.2.0
+
+* Rename the listener function.
+```text
+// addPolyGeofenceStatusChangedListener(_onPolyGeofenceStatusChanged);
+// addPositionChangedListener(_onPositionChanged);
+// addLocationServiceStatusChangedListener(_onLocationServiceStatusChanged);
+// removePolyGeofenceStatusChangedListener(_onPolyGeofenceStatusChanged);
+// removePositionChangedListener(_onPositionChanged);
+// removeLocationServiceStatusChangedListener(_onLocationServiceStatusChanged);
+
+addPolyGeofenceStatusChangeListener(_onPolyGeofenceStatusChanged);
+addPositionChangeListener(_onPositionChanged);
+addLocationServiceStatusChangeListener(_onLocationServiceStatusChanged);
+removePolyGeofenceStatusChangeListener(_onPolyGeofenceStatusChanged);
+removePositionChangeListener(_onPositionChanged);
+removeLocationServiceStatusChangeListener(_onLocationServiceStatusChanged);
+```
+* Add `printDevLog` option.
+* Upgrade geolocator: ^7.1.0
+
 ## 1.1.0
 
 * Add `addPositionChangedListener` function.
@@ -28,7 +49,7 @@ You need to add the code below to your android manifest file. See the Getting st
 
 * Updates README.md
 * Upgrade flutter_foreground_task: ^1.0.7
-* Add `statusChangeDelayMs` options.
+* Add `statusChangeDelayMs` option.
 
 ## 1.0.0
 
