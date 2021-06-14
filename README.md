@@ -130,37 +130,35 @@ final _polyGeofenceList = <PolyGeofence>[
 3. Register the listener and call `PolyGeofenceService.instance.start()`.
 
 ```dart
-import 'dart:developer' as dev;
-
-// This function is to be called when the geofence state is changed.
+// This function is to be called when the geofence status is changed.
 Future<void> _onPolyGeofenceStatusChanged(
     PolyGeofence polyGeofence,
     PolyGeofenceStatus polyGeofenceStatus,
     Position position) async {
-  dev.log('geofence: ${polyGeofence.toJson()}');
-  dev.log('position: ${position.toJson()}');
+  print('geofence: ${polyGeofence.toJson()}');
+  print('position: ${position.toJson()}');
 }
 
 // This function is to be called when the position has changed.
 void _onPositionChanged(Position position) {
-  dev.log('position: ${position.toJson()}');
+  print('position: ${position.toJson()}');
 }
 
 // This function is to be called when a location service status change occurs
 // since the service was started.
 void _onLocationServiceStatusChanged(bool status) {
-  dev.log('location service status: $status');
+  print('location service status: $status');
 }
 
 // This function is used to handle errors that occur in the service.
 void _onError(error) {
   final errorCode = getErrorCodesFromError(error);
   if (errorCode == null) {
-    dev.log('Undefined error: $error');
+    print('Undefined error: $error');
     return;
   }
 
-  dev.log('ErrorCode: $errorCode');
+  print('ErrorCode: $errorCode');
 }
 
 @override
