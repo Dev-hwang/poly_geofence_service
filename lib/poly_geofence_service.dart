@@ -48,9 +48,9 @@ class PolyGeofenceService {
   StreamSubscription<bool>? _locationServiceStatusStream;
 
   final _polyGeofenceList = <PolyGeofence>[];
-  final _polyGeofenceStatusChangedListeners = <PolyGeofenceStatusChanged>[];
-  final _positionChangedListeners = <ValueChanged<Position>>[];
-  final _locationServiceStatusChangedListeners = <ValueChanged<bool>>[];
+  final _polyGeofenceStatusChangeListeners = <PolyGeofenceStatusChanged>[];
+  final _positionChangeListeners = <ValueChanged<Position>>[];
+  final _locationServiceStatusChangeListeners = <ValueChanged<bool>>[];
   final _streamErrorListeners = <ValueChanged>[];
 
   /// Setup [PolyGeofenceService].
@@ -107,38 +107,38 @@ class PolyGeofenceService {
   }
 
   /// Register a closure to be called when the [PolyGeofenceStatus] changes.
-  void addPolyGeofenceStatusChangedListener(
+  void addPolyGeofenceStatusChangeListener(
       PolyGeofenceStatusChanged listener) {
-    _polyGeofenceStatusChangedListeners.add(listener);
+    _polyGeofenceStatusChangeListeners.add(listener);
   }
 
   /// Remove a previously registered closure from the list of closures that
   /// are notified when the [PolyGeofenceStatus] changes.
-  void removePolyGeofenceStatusChangedListener(
+  void removePolyGeofenceStatusChangeListener(
       PolyGeofenceStatusChanged listener) {
-    _polyGeofenceStatusChangedListeners.remove(listener);
+    _polyGeofenceStatusChangeListeners.remove(listener);
   }
 
   /// Register a closure to be called when the [Position] changes.
-  void addPositionChangedListener(ValueChanged<Position> listener) {
-    _positionChangedListeners.add(listener);
+  void addPositionChangeListener(ValueChanged<Position> listener) {
+    _positionChangeListeners.add(listener);
   }
 
   /// Remove a previously registered closure from the list of closures that
   /// are notified when the [Position] changes.
-  void removePositionChangedListener(ValueChanged<Position> listener) {
-    _positionChangedListeners.remove(listener);
+  void removePositionChangeListener(ValueChanged<Position> listener) {
+    _positionChangeListeners.remove(listener);
   }
 
   /// Register a closure to be called when the location service status changes.
-  void addLocationServiceStatusChangedListener(ValueChanged<bool> listener) {
-    _locationServiceStatusChangedListeners.add(listener);
+  void addLocationServiceStatusChangeListener(ValueChanged<bool> listener) {
+    _locationServiceStatusChangeListeners.add(listener);
   }
 
   /// Remove a previously registered closure from the list of closures that
   /// are notified when the location service status changes.
-  void removeLocationServiceStatusChangedListener(ValueChanged<bool> listener) {
-    _locationServiceStatusChangedListeners.remove(listener);
+  void removeLocationServiceStatusChangeListener(ValueChanged<bool> listener) {
+    _locationServiceStatusChangeListeners.remove(listener);
   }
 
   /// Register a closure to be called when a stream error occurs.
@@ -185,7 +185,7 @@ class PolyGeofenceService {
 
   Future<void> _checkPermissions() async {
     // Check that the location service is enabled.
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    final serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled)
       return Future.error(ErrorCodes.LOCATION_SERVICE_DISABLED);
 
@@ -227,17 +227,17 @@ class PolyGeofenceService {
     if (position.isMocked && !_options.allowMockLocations) return;
     if (position.accuracy > _options.accuracy) return;
 
-    for (final listener in _positionChangedListeners) listener(position);
+    for (final listener in _positionChangeListeners) listener(position);
 
     // Pause the service and process the position.
-    pause();
+    _positionStream?.pause();
 
     PolyGeofence polyGeofence;
     PolyGeofenceStatus polyGeofenceStatus;
     final currTimestamp = position.timestamp ?? DateTime.now();
     DateTime? polyTimestamp;
     Duration diffTimestamp;
-    for (int i = 0; i < _polyGeofenceList.length; i++) {
+    for (var i = 0; i < _polyGeofenceList.length; i++) {
       polyGeofence = _polyGeofenceList[i];
 
       polyTimestamp = polyGeofence.timestamp;
@@ -260,17 +260,17 @@ class PolyGeofenceService {
           diffTimestamp.inMilliseconds < _options.statusChangeDelayMs) continue;
       if (!polyGeofence.updateStatus(polyGeofenceStatus, position)) continue;
 
-      for (final listener in _polyGeofenceStatusChangedListeners)
+      for (final listener in _polyGeofenceStatusChangeListeners)
         await listener(polyGeofence, polyGeofenceStatus, position)
             .catchError(_handleStreamError);
     }
 
     // Service resumes when position processing is complete.
-    resume();
+    _positionStream?.resume();
   }
 
   void _onLocationServiceStatusChange(bool status) {
-    for (final listener in _locationServiceStatusChangedListeners)
+    for (final listener in _locationServiceStatusChangeListeners)
       listener(status);
   }
 

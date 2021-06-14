@@ -165,9 +165,9 @@ void _onError(error) {
 void initState() {
   super.initState();
   WidgetsBinding.instance?.addPostFrameCallback((_) {
-    _polyGeofenceService.addPolyGeofenceStatusChangedListener(_onPolyGeofenceStatusChanged);
-    _polyGeofenceService.addPositionChangedListener(_onPositionChanged);
-    _polyGeofenceService.addLocationServiceStatusChangedListener(_onLocationServiceStatusChanged);
+    _polyGeofenceService.addPolyGeofenceStatusChangeListener(_onPolyGeofenceStatusChanged);
+    _polyGeofenceService.addPositionChangeListener(_onPositionChanged);
+    _polyGeofenceService.addLocationServiceStatusChangeListener(_onLocationServiceStatusChanged);
     _polyGeofenceService.addStreamErrorListener(_onError);
     _polyGeofenceService.start(_polyGeofenceList).catchError(_onError);
   });
@@ -234,9 +234,9 @@ _polyGeofenceService.resume();
 #### 7. When you are finished using the service, unregister the listener and call `PolyGeofenceService.instance.stop()`.
 
 ```text
-_polyGeofenceService.removePolyGeofenceStatusChangedListener(_onPolyGeofenceStatusChanged);
-_polyGeofenceService.removePositionChangedListener(_onPositionChanged);
-_polyGeofenceService.removeLocationServiceStatusChangedListener(_onLocationServiceStatusChanged);
+_polyGeofenceService.removePolyGeofenceStatusChangeListener(_onPolyGeofenceStatusChanged);
+_polyGeofenceService.removePositionChangeListener(_onPositionChanged);
+_polyGeofenceService.removeLocationServiceStatusChangeListener(_onLocationServiceStatusChanged);
 _polyGeofenceService.removeStreamErrorListener(_onError);
 _polyGeofenceService.stop();
 ```

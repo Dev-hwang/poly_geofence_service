@@ -77,9 +77,9 @@ class _ExampleAppState extends State<ExampleApp> {
   void initState() {
     super.initState();
     WidgetsBinding.instance?.addPostFrameCallback((_) {
-      _polyGeofenceService.addPolyGeofenceStatusChangedListener(_onPolyGeofenceStatusChanged);
-      _polyGeofenceService.addPositionChangedListener(_onPositionChanged);
-      _polyGeofenceService.addLocationServiceStatusChangedListener(_onLocationServiceStatusChanged);
+      _polyGeofenceService.addPolyGeofenceStatusChangeListener(_onPolyGeofenceStatusChanged);
+      _polyGeofenceService.addPositionChangeListener(_onPositionChanged);
+      _polyGeofenceService.addLocationServiceStatusChangeListener(_onLocationServiceStatusChanged);
       _polyGeofenceService.addStreamErrorListener(_onError);
       _polyGeofenceService.start(_polyGeofenceList).catchError(_onError);
     });
