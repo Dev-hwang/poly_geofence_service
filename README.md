@@ -88,6 +88,7 @@ If you want to run the service in the background, add the following permissions.
 * `loiteringDelayMs`: Sets the delay between `PolyGeofenceStatus.ENTER` and `PolyGeofenceStatus.DWELL` in milliseconds. The default is `300000`.
 * `statusChangeDelayMs`: Sets the status change delay in milliseconds. `PolyGeofenceStatus.ENTER` and `PolyGeofenceStatus.EXIT` events may be called frequently when the location is near the boundary of the polygon geofence. Use this option to minimize event calls at this time. If the option value is too large, realtime geo-fencing is not possible, so use it carefully. The default is `10000`.
 * `allowMockLocations`: Whether to allow mock locations. The default is `false`.
+* `printDevLog`: Whether to show the developer log. If this value is set to true, logs for geofence service activities (start, stop, etc.) can be viewed. It does not work in release mode. The default is `false`.
 
 ```dart
 // Create a [PolyGeofenceService] instance and set options.
@@ -96,7 +97,8 @@ final _polyGeofenceService = PolyGeofenceService.instance.setup(
     accuracy: 100,
     loiteringDelayMs: 60000,
     statusChangeDelayMs: 10000,
-    allowMockLocations: false);
+    allowMockLocations: false,
+    printDevLog: false);
 ```
 
 #### 2. Create a `PolyGeofence` list. `PolyGeofence` provides the following parameters:

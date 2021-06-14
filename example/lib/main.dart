@@ -20,7 +20,8 @@ class _ExampleAppState extends State<ExampleApp> {
       accuracy: 100,
       loiteringDelayMs: 60000,
       statusChangeDelayMs: 10000,
-      allowMockLocations: false);
+      allowMockLocations: false,
+      printDevLog: false);
 
   // Create a [PolyGeofence] list.
   final _polyGeofenceList = <PolyGeofence>[

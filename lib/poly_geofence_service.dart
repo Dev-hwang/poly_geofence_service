@@ -1,5 +1,5 @@
 import 'dart:async';
-// import 'dart:developer' as dev;
+import 'dart:developer' as dev;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -60,12 +60,14 @@ class PolyGeofenceService {
       int? accuracy,
       int? loiteringDelayMs,
       int? statusChangeDelayMs,
-      bool? allowMockLocations}) {
+      bool? allowMockLocations,
+      bool? printDevLog}) {
     _options.interval = interval;
     _options.accuracy = accuracy;
     _options.loiteringDelayMs = loiteringDelayMs;
     _options.statusChangeDelayMs = statusChangeDelayMs;
     _options.allowMockLocations = allowMockLocations;
+    _options.printDevLog = printDevLog;
 
     return this;
   }
@@ -81,7 +83,7 @@ class PolyGeofenceService {
     if (polyGeofenceList != null) _polyGeofenceList.addAll(polyGeofenceList);
 
     _isRunningService = true;
-    // if (!kReleaseMode) dev.log('PolyGeofenceService started.');
+    _printDevLog('PolyGeofenceService started.');
   }
 
   /// Stop [PolyGeofenceService].
@@ -91,25 +93,26 @@ class PolyGeofenceService {
     _polyGeofenceList.clear();
 
     _isRunningService = false;
-    // if (!kReleaseMode) dev.log('PolyGeofenceService stopped.');
+    _printDevLog('PolyGeofenceService stopped.');
   }
 
   /// Pause [PolyGeofenceService].
   void pause() {
     _positionStream?.pause();
-    // if (!kReleaseMode) dev.log('PolyGeofenceService paused.');
+    _printDevLog('PolyGeofenceService paused.');
   }
 
   /// Resume [PolyGeofenceService].
   void resume() {
     _positionStream?.resume();
-    // if (!kReleaseMode) dev.log('PolyGeofenceService resumed.');
+    _printDevLog('PolyGeofenceService resumed.');
   }
 
   /// Register a closure to be called when the [PolyGeofenceStatus] changes.
-  void addPolyGeofenceStatusChangeListener(
-      PolyGeofenceStatusChanged listener) {
+  void addPolyGeofenceStatusChangeListener(PolyGeofenceStatusChanged listener) {
     _polyGeofenceStatusChangeListeners.add(listener);
+    _printDevLog(
+        'Added PolyGeofenceStatusChange listener. (size: ${_polyGeofenceStatusChangeListeners.length})');
   }
 
   /// Remove a previously registered closure from the list of closures that
@@ -117,70 +120,92 @@ class PolyGeofenceService {
   void removePolyGeofenceStatusChangeListener(
       PolyGeofenceStatusChanged listener) {
     _polyGeofenceStatusChangeListeners.remove(listener);
+    _printDevLog(
+        'The PolyGeofenceStatusChange listener has been removed. (size: ${_polyGeofenceStatusChangeListeners.length})');
   }
 
   /// Register a closure to be called when the [Position] changes.
   void addPositionChangeListener(ValueChanged<Position> listener) {
     _positionChangeListeners.add(listener);
+    _printDevLog(
+        'Added PositionChange listener. (size: ${_positionChangeListeners.length})');
   }
 
   /// Remove a previously registered closure from the list of closures that
   /// are notified when the [Position] changes.
   void removePositionChangeListener(ValueChanged<Position> listener) {
     _positionChangeListeners.remove(listener);
+    _printDevLog(
+        'The PositionChange listener has been removed. (size: ${_positionChangeListeners.length})');
   }
 
   /// Register a closure to be called when the location service status changes.
   void addLocationServiceStatusChangeListener(ValueChanged<bool> listener) {
     _locationServiceStatusChangeListeners.add(listener);
+    _printDevLog(
+        'Added LocationServiceStatusChange listener. (size: ${_locationServiceStatusChangeListeners.length})');
   }
 
   /// Remove a previously registered closure from the list of closures that
   /// are notified when the location service status changes.
   void removeLocationServiceStatusChangeListener(ValueChanged<bool> listener) {
     _locationServiceStatusChangeListeners.remove(listener);
+    _printDevLog(
+        'The LocationServiceStatusChange listener has been removed. (size: ${_locationServiceStatusChangeListeners.length})');
   }
 
   /// Register a closure to be called when a stream error occurs.
   void addStreamErrorListener(ValueChanged listener) {
     _streamErrorListeners.add(listener);
+    _printDevLog(
+        'Added StreamError listener. (size: ${_streamErrorListeners.length})');
   }
 
   /// Remove a previously registered closure from the list of closures that
   /// are notified when a stream error occurs.
   void removeStreamErrorListener(ValueChanged listener) {
     _streamErrorListeners.remove(listener);
+    _printDevLog(
+        'The StreamError listener has been removed. (size: ${_streamErrorListeners.length})');
   }
 
   /// Add polygon geofence.
   void addPolyGeofence(PolyGeofence polyGeofence) {
     _polyGeofenceList.add(polyGeofence);
+    _printDevLog(
+        'Added PolyGeofence(${polyGeofence.id}) (size: ${_polyGeofenceList.length})');
   }
 
   /// Add polygon geofence list.
   void addPolyGeofenceList(List<PolyGeofence> polyGeofenceList) {
-    _polyGeofenceList.addAll(polyGeofenceList);
+    for (var i = 0; i < polyGeofenceList.length; i++)
+      addPolyGeofence(polyGeofenceList[i]);
   }
 
   /// Remove polygon geofence.
   void removePolyGeofence(PolyGeofence polyGeofence) {
     _polyGeofenceList.remove(polyGeofence);
+    _printDevLog(
+        'The PolyGeofence(${polyGeofence.id}) has been removed. (size: ${_polyGeofenceList.length})');
   }
 
   /// Remove polygon geofence list.
   void removePolyGeofenceList(List<PolyGeofence> polyGeofenceList) {
-    for (int i = 0; i < polyGeofenceList.length; i++)
+    for (var i = 0; i < polyGeofenceList.length; i++)
       removePolyGeofence(polyGeofenceList[i]);
   }
 
   /// Remove polygon geofence by [id].
   void removePolyGeofenceById(String id) {
     _polyGeofenceList.removeWhere((polyGeofence) => polyGeofence.id == id);
+    _printDevLog(
+        'The PolyGeofence($id) has been removed. (size: ${_polyGeofenceList.length})');
   }
 
   /// Clear polygon geofence list.
   void clearPolyGeofenceList() {
     _polyGeofenceList.clear();
+    _printDevLog('The PolyGeofenceList has been cleared.');
   }
 
   Future<void> _checkPermissions() async {
@@ -274,7 +299,15 @@ class PolyGeofenceService {
       listener(status);
   }
 
-  void _handleStreamError(error) {
+  void _handleStreamError(dynamic error) {
     for (final listener in _streamErrorListeners) listener(error);
+  }
+
+  void _printDevLog(String message) {
+    if (kReleaseMode) return;
+    if (!_options.printDevLog) return;
+
+    final nowDateTime = DateTime.now().toString();
+    dev.log('$nowDateTime\t$message');
   }
 }

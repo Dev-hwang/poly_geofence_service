@@ -23,6 +23,12 @@ class PolyGeofenceServiceOptions {
   /// The default is `false`.
   bool _allowMockLocations = false;
 
+  /// Whether to show the developer log.
+  /// If this value is set to true, logs for geofence service activities (start, stop, etc.) can be viewed.
+  /// It does not work in release mode.
+  /// The default is `false`.
+  bool _printDevLog = false;
+
   int get interval => _interval;
   set interval(int? value) => _interval = value ?? _interval;
 
@@ -40,4 +46,7 @@ class PolyGeofenceServiceOptions {
   bool get allowMockLocations => _allowMockLocations;
   set allowMockLocations(bool? value) =>
       _allowMockLocations = value ?? _allowMockLocations;
+
+  bool get printDevLog => _printDevLog;
+  set printDevLog(bool? value) => _printDevLog = value ?? _printDevLog;
 }
