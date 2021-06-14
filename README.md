@@ -82,7 +82,7 @@ If you want to run the service in the background, add the following permissions.
 
 ## How to use
 
-### 1. Create a `PolyGeofenceService` instance and set options. `PolyGeofenceService.instance.setup()` provides the following options:
+#### 1. Create a `PolyGeofenceService` instance and set options. `PolyGeofenceService.instance.setup()` provides the following options:
 * `interval`: The time interval in milliseconds to check the polygon geofence status. The default is `5000`.
 * `accuracy`: Geo-fencing error range in meters. The default is `100`.
 * `loiteringDelayMs`: Sets the delay between `PolyGeofenceStatus.ENTER` and `PolyGeofenceStatus.DWELL` in milliseconds. The default is `300000`.
@@ -99,7 +99,7 @@ final _polyGeofenceService = PolyGeofenceService.instance.setup(
     allowMockLocations: false);
 ```
 
-### 2. Create a `PolyGeofence` list. `PolyGeofence` provides the following parameters:
+#### 2. Create a `PolyGeofence` list. `PolyGeofence` provides the following parameters:
 * `id`: Identifier for `PolyGeofence`.
 * `data`: Custom data for `PolyGeofence`.
 * `polygon`: A list of coordinates to create a polygon. The polygon is always considered closed, regardless of whether the last point equals the first or not.
@@ -125,7 +125,7 @@ final _polyGeofenceList = <PolyGeofence>[
 ];
 ```
 
-### 3. Register a listener and call `PolyGeofenceService.instance.start()`.
+#### 3. Register the listener and call `PolyGeofenceService.instance.start()`.
 
 ```dart
 import 'dart:developer' as dev;
@@ -174,7 +174,7 @@ void initState() {
 }
 ```
 
-### 4. Add `WillStartForegroundTask` widget for background execution on Android platform. `WillStartForegroundTask` provides the following options:
+#### 4. Add `WillStartForegroundTask` widget for background execution on Android platform. `WillStartForegroundTask` provides the following options:
 * `onWillStart`: Called to ask if you want to start the foreground task.
 * `notificationOptions`: Optional values for notification detail settings.
 * `notificationTitle`: The title that will be displayed in the notification.
@@ -213,18 +213,25 @@ Widget build(BuildContext context) {
 }
 ```
 
-### 5. To add or remove `PolyGeofence` while the service is running, use the following function:
+#### 5. To add or remove `PolyGeofence` while the service is running, use the following function:
 
 ```text
-_polyGeofenceService.addPolyGeofence(Model);
-_polyGeofenceService.addPolyGeofenceList(ModelList);
-_polyGeofenceService.removePolyGeofence(Model);
-_polyGeofenceService.removePolyGeofenceList(ModelList);
+_polyGeofenceService.addPolyGeofence(Object);
+_polyGeofenceService.addPolyGeofenceList(List);
+_polyGeofenceService.removePolyGeofence(Object);
+_polyGeofenceService.removePolyGeofenceList(List);
 _polyGeofenceService.removePolyGeofenceById(String);
 _polyGeofenceService.clearPolyGeofenceList();
 ```
 
-### 6. When you are finished using the service, unregister a callback listener and call `PolyGeofenceService.instance.stop()`.
+#### 6. If you want to pause or resume the service, use the function below.
+
+```text
+_polyGeofenceService.pause();
+_polyGeofenceService.resume();
+```
+
+#### 7. When you are finished using the service, unregister the listener and call `PolyGeofenceService.instance.stop()`.
 
 ```text
 _polyGeofenceService.removePolyGeofenceStatusChangedListener(_onPolyGeofenceStatusChanged);
@@ -233,6 +240,8 @@ _polyGeofenceService.removeLocationServiceStatusChangedListener(_onLocationServi
 _polyGeofenceService.removeStreamErrorListener(_onError);
 _polyGeofenceService.stop();
 ```
+
+**Note**: When calling the stop function, the listener is not removed, but the added geofence is cleared.
 
 ## Models
 
