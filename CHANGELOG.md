@@ -1,3 +1,8 @@
+## 1.2.1
+
+* Update example
+* Update README.md
+
 ## 1.2.0
 
 * Upgrade geolocator: ^7.1.0
