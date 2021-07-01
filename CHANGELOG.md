@@ -1,3 +1,7 @@
+## 1.2.4
+
+* Upgrade flutter_foreground_task: ^2.0.1
+
 ## 1.2.3
 
 * Upgrade geolocator: ^7.2.0+1
