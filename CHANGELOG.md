@@ -1,3 +1,8 @@
+## 1.2.5
+
+* Move component declaration inside the plugin. Check the readme for more details.
+* Upgrade flutter_foreground_task: ^2.0.3
+
 ## 1.2.4
 
 * Upgrade flutter_foreground_task: ^2.0.1
