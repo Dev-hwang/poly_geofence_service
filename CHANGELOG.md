@@ -21,6 +21,14 @@
 * Upgrade geolocator: ^7.1.0
 * Add `printDevLog` option.
 * Rename the listener function.
+```text
+addPolyGeofenceStatusChangedListener -> addPolyGeofenceStatusChangeListener;
+addPositionChangedListener -> addPositionChangeListener;
+addLocationServiceStatusChangedListener -> addLocationServiceStatusChangeListener;
+removePolyGeofenceStatusChangedListener -> removePolyGeofenceStatusChangeListener;
+removePositionChangedListener -> removePositionChangeListener;
+removeLocationServiceStatusChangedListener -> removeLocationServiceStatusChangeListener;
+```
 
 ## 1.1.0
 
