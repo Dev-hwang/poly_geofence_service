@@ -21,21 +21,6 @@
 * Upgrade geolocator: ^7.1.0
 * Add `printDevLog` option.
 * Rename the listener function.
-```text
-// addPolyGeofenceStatusChangedListener(_onPolyGeofenceStatusChanged);
-// addPositionChangedListener(_onPositionChanged);
-// addLocationServiceStatusChangedListener(_onLocationServiceStatusChanged);
-// removePolyGeofenceStatusChangedListener(_onPolyGeofenceStatusChanged);
-// removePositionChangedListener(_onPositionChanged);
-// removeLocationServiceStatusChangedListener(_onLocationServiceStatusChanged);
-
-addPolyGeofenceStatusChangeListener(_onPolyGeofenceStatusChanged);
-addPositionChangeListener(_onPositionChanged);
-addLocationServiceStatusChangeListener(_onLocationServiceStatusChanged);
-removePolyGeofenceStatusChangeListener(_onPolyGeofenceStatusChanged);
-removePositionChangeListener(_onPositionChanged);
-removeLocationServiceStatusChangeListener(_onLocationServiceStatusChanged);
-```
 
 ## 1.1.0
 
@@ -43,14 +28,6 @@ removeLocationServiceStatusChangeListener(_onLocationServiceStatusChanged);
 * Add `removePositionChangedListener` function.
 * Add `addLocationServiceStatusChangedListener` function.
 * Add `removeLocationServiceStatusChangedListener` function.
-> A service has been added to check the location service status change while the geofence service is running. 
-You need to add the code below to your android manifest file. See the Getting started section of the readme for details.
-```xml
-<service
-    android:name="com.pravera.poly_geofence_service.service.LocationProviderIntentService"
-    android:permission="android.permission.BIND_JOB_SERVICE"
-    android:stopWithTask="true" />
-```
 * Change the model's `toMap` function name to `toJson`.
 * Update example
 * Update README.md
