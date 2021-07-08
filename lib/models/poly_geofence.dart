@@ -1,4 +1,3 @@
-import 'package:geolocator/geolocator.dart';
 import 'package:poly_geofence_service/models/lat_lng.dart';
 import 'package:poly_geofence_service/models/poly_geofence_status.dart';
 
@@ -44,10 +43,10 @@ class PolyGeofence {
 
   /// Update the status of [PolyGeofence].
   /// Returns true if the status changes, false otherwise.
-  bool updateStatus(PolyGeofenceStatus status, Position position) {
+  bool updateStatus(PolyGeofenceStatus status, DateTime timestamp) {
     if (status != _status) {
       _status = status;
-      _timestamp = position.timestamp;
+      _timestamp = timestamp;
       return true;
     }
 

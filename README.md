@@ -104,7 +104,7 @@ final _polyGeofenceList = <PolyGeofence>[
     id: 'Yongdusan_Park',
     data: {
       'address': '37-55 Yongdusan-gil, Gwangbokdong 2(i)-ga, Jung-gu, Busan',
-      'about': 'Mountain park known for its 129m-high observation tower, statues & stone monuments.'
+      'about': 'Mountain park known for its 129m-high observation tower, statues & stone monuments.',
     },
     polygon: <LatLng>[
       const LatLng(35.101727, 129.031665),
@@ -112,7 +112,7 @@ final _polyGeofenceList = <PolyGeofence>[
       const LatLng(35.100032, 129.034055),
       const LatLng(35.099324, 129.033811),
       const LatLng(35.099906, 129.031927),
-      const LatLng(35.101080, 129.031534)
+      const LatLng(35.101080, 129.031534),
     ],
   ),
 ];
@@ -125,14 +125,14 @@ final _polyGeofenceList = <PolyGeofence>[
 Future<void> _onPolyGeofenceStatusChanged(
     PolyGeofence polyGeofence,
     PolyGeofenceStatus polyGeofenceStatus,
-    Position position) async {
-  print('geofence: ${polyGeofence.toJson()}');
-  print('position: ${position.toJson()}');
+    LocationData locationData) async {
+  print('polyGeofence: ${polyGeofence.toJson()}');
+  print('locationData: ${locationData.toString()}');
 }
 
-// This function is to be called when the position has changed.
-void _onPositionChanged(Position position) {
-  print('position: ${position.toJson()}');
+// This function is to be called when the location data has changed.
+void _onLocationDataChanged(LocationData locationData) {
+  print('locationData: ${locationData.toString()}');
 }
 
 // This function is to be called when a location service status change occurs
@@ -157,7 +157,7 @@ void initState() {
   super.initState();
   WidgetsBinding.instance?.addPostFrameCallback((_) {
     _polyGeofenceService.addPolyGeofenceStatusChangeListener(_onPolyGeofenceStatusChanged);
-    _polyGeofenceService.addPositionChangeListener(_onPositionChanged);
+    _polyGeofenceService.addLocationDataChangeListener(_onLocationDataChanged);
     _polyGeofenceService.addLocationServiceStatusChangeListener(_onLocationServiceStatusChanged);
     _polyGeofenceService.addStreamErrorListener(_onError);
     _polyGeofenceService.start(_polyGeofenceList).catchError(_onError);
@@ -188,16 +188,16 @@ Widget build(BuildContext context) {
         channelName: 'Geofence Service Notification',
         channelDescription: 'This notification appears when the geofence service is running in the background.',
         channelImportance: NotificationChannelImportance.LOW,
-        priority: NotificationPriority.LOW
+        priority: NotificationPriority.LOW,
       ),
       notificationTitle: 'Geofence Service is running',
       notificationText: 'Tap to return to the app',
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Poly Geofence Service'),
-          centerTitle: true
+          centerTitle: true,
         ),
-        body: _buildContentView()
+        body: _buildContentView(),
       ),
     ),
   );
@@ -226,7 +226,7 @@ _polyGeofenceService.resume();
 
 ```text
 _polyGeofenceService.removePolyGeofenceStatusChangeListener(_onPolyGeofenceStatusChanged);
-_polyGeofenceService.removePositionChangeListener(_onPositionChanged);
+_polyGeofenceService.removeLocationDataChangeListener(_onLocationDataChanged);
 _polyGeofenceService.removeLocationServiceStatusChangeListener(_onLocationServiceStatusChanged);
 _polyGeofenceService.removeStreamErrorListener(_onError);
 _polyGeofenceService.stop();
