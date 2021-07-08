@@ -1,3 +1,19 @@
+## 1.3.0
+
+* [**BREAKING**] Remove `geolocator` plugin.
+* [**BREAKING**] Add `location` plugin.
+* [**BREAKING**] Change the geolocation model.
+```text
+Position -> LocationData
+```
+* [**BREAKING**] Rename the listener function.
+```text
+addPositionChangeListener -> addLocationDataChangeListener
+removePositionChangeListener -> removeLocationDataChangeListener
+```
+* Fix location permission request not working properly.
+* Fix an issue that the location stream is not closed even when the service is stopped.
+
 ## 1.2.5
 
 * Move component declaration inside the plugin. Check the readme for more details.
@@ -27,12 +43,12 @@
 * Add `printDevLog` option.
 * Rename the listener function.
 ```text
-addPolyGeofenceStatusChangedListener -> addPolyGeofenceStatusChangeListener;
-addPositionChangedListener -> addPositionChangeListener;
-addLocationServiceStatusChangedListener -> addLocationServiceStatusChangeListener;
-removePolyGeofenceStatusChangedListener -> removePolyGeofenceStatusChangeListener;
-removePositionChangedListener -> removePositionChangeListener;
-removeLocationServiceStatusChangedListener -> removeLocationServiceStatusChangeListener;
+addPolyGeofenceStatusChangedListener -> addPolyGeofenceStatusChangeListener
+addPositionChangedListener -> addPositionChangeListener
+addLocationServiceStatusChangedListener -> addLocationServiceStatusChangeListener
+removePolyGeofenceStatusChangedListener -> removePolyGeofenceStatusChangeListener
+removePositionChangedListener -> removePositionChangeListener
+removeLocationServiceStatusChangedListener -> removeLocationServiceStatusChangeListener
 ```
 
 ## 1.1.0
