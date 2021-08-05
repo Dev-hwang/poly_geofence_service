@@ -5,9 +5,9 @@ enum ErrorCodes {
   /// Occurs when the service has already been started but the start function is called.
   ALREADY_STARTED,
 
-  /// Occurs when location service are disabled.
+  /// Occurs when location services are disabled.
   /// When this error occurs, you should notify the user and request activation.
-  LOCATION_SERVICE_DISABLED,
+  LOCATION_SERVICES_DISABLED,
 
   /// Occurs when location permission is denied.
   LOCATION_PERMISSION_DENIED,

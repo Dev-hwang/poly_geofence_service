@@ -33,7 +33,7 @@ Since geo-fencing operates based on location, we need to add the following permi
 <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 ```
 
-In addition, if you want to run the service in the background, add the following permission. If your project supports Android 10, be sure to add the `ACCESS_BACKGROUND_LOCATION` permission.
+If you want to run the service in the background, add the following permission. If your project supports Android 10, be sure to add the `ACCESS_BACKGROUND_LOCATION` permission.
 
 ```
 <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
@@ -50,14 +50,14 @@ And specify the service inside the `<application>` tag as follows.
 
 ### :baby_chick: iOS
 
-Like Android platform, geo-fencing is based on location, so you need to specify location permission. Open the `ios/Runner/Info.plist` file and add the following permission inside the `<dict>` tag.
+Like Android platform, geo-fencing is based on location, we need to add the following description. Open the `ios/Runner/Info.plist` file and specify it inside the `<dict>` tag.
 
 ```
 <key>NSLocationWhenInUseUsageDescription</key>
 <string>Used to provide geofence service.</string>
 ```
 
-If you want to run the service in the background, add the following permissions.
+If you want to run the service in the background, add the following description.
 
 ```
 <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
@@ -125,20 +125,20 @@ final _polyGeofenceList = <PolyGeofence>[
 Future<void> _onPolyGeofenceStatusChanged(
     PolyGeofence polyGeofence,
     PolyGeofenceStatus polyGeofenceStatus,
-    LocationData locationData) async {
+    Location location) async {
   print('polyGeofence: ${polyGeofence.toJson()}');
-  print('locationData: ${locationData.toString()}');
+  print('polyGeofenceStatus: ${polyGeofenceStatus.toString()}');
 }
 
-// This function is to be called when the location data has changed.
-void _onLocationDataChanged(LocationData locationData) {
-  print('locationData: ${locationData.toString()}');
+// This function is to be called when the location has changed.
+void _onLocationChanged(Location location) {
+  print('location: ${location.toJson()}');
 }
 
-// This function is to be called when a location service status change occurs
+// This function is to be called when a location services status change occurs
 // since the service was started.
-void _onLocationServiceStatusChanged(bool status) {
-  print('location service status: $status');
+void _onLocationServicesStatusChanged(bool status) {
+  print('isLocationServicesEnabled: $status');
 }
 
 // This function is used to handle errors that occur in the service.
@@ -157,8 +157,8 @@ void initState() {
   super.initState();
   WidgetsBinding.instance?.addPostFrameCallback((_) {
     _polyGeofenceService.addPolyGeofenceStatusChangeListener(_onPolyGeofenceStatusChanged);
-    _polyGeofenceService.addLocationDataChangeListener(_onLocationDataChanged);
-    _polyGeofenceService.addLocationServiceStatusChangeListener(_onLocationServiceStatusChanged);
+    _polyGeofenceService.addLocationChangeListener(_onLocationChanged);
+    _polyGeofenceService.addLocationServicesStatusChangeListener(_onLocationServicesStatusChanged);
     _polyGeofenceService.addStreamErrorListener(_onError);
     _polyGeofenceService.start(_polyGeofenceList).catchError(_onError);
   });
@@ -226,8 +226,8 @@ _polyGeofenceService.resume();
 
 ```text
 _polyGeofenceService.removePolyGeofenceStatusChangeListener(_onPolyGeofenceStatusChanged);
-_polyGeofenceService.removeLocationDataChangeListener(_onLocationDataChanged);
-_polyGeofenceService.removeLocationServiceStatusChangeListener(_onLocationServiceStatusChanged);
+_polyGeofenceService.removeLocationChangeListener(_onLocationChanged);
+_polyGeofenceService.removeLocationServicesStatusChangeListener(_onLocationServicesStatusChanged);
 _polyGeofenceService.removeStreamErrorListener(_onError);
 _polyGeofenceService.stop();
 ```
@@ -274,7 +274,7 @@ Error codes that may occur in the service.
 | Value | Description |
 |---|---|
 | `ALREADY_STARTED` | Occurs when the service has already been started but the start function is called. |
-| `LOCATION_SERVICE_DISABLED` | Occurs when location service are disabled. When this error occurs, you should notify the user and request activation. |
+| `LOCATION_SERVICES_DISABLED` | Occurs when location services are disabled. When this error occurs, you should notify the user and request activation. |
 | `LOCATION_PERMISSION_DENIED` | Occurs when location permission is denied. |
 | `LOCATION_PERMISSION_PERMANENTLY_DENIED` | Occurs when location permission is permanently denied. In this case, the user must manually allow the permission. |
 

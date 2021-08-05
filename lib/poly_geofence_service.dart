@@ -1,18 +1,17 @@
 import 'dart:async';
 import 'dart:developer' as dev;
 
+import 'package:fl_location/fl_location.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:location/location.dart';
 import 'package:poly_geofence_service/models/error_codes.dart';
 import 'package:poly_geofence_service/models/poly_geofence.dart';
 import 'package:poly_geofence_service/models/poly_geofence_service_options.dart';
 import 'package:poly_geofence_service/models/poly_geofence_status.dart';
 import 'package:poly_geofence_service/utils/poly_utils.dart';
 
+export 'package:fl_location/fl_location.dart';
 export 'package:flutter_foreground_task/flutter_foreground_task.dart';
-export 'package:location/location.dart';
 export 'package:poly_geofence_service/models/error_codes.dart';
 export 'package:poly_geofence_service/models/lat_lng.dart';
 export 'package:poly_geofence_service/models/poly_geofence.dart';
@@ -20,11 +19,14 @@ export 'package:poly_geofence_service/models/poly_geofence_service_options.dart'
 export 'package:poly_geofence_service/models/poly_geofence_status.dart';
 export 'package:poly_geofence_service/utils/poly_utils.dart';
 
-/// Function to notify polygon geofence status changes.
+/// Callback function to handle polygon geofence status changes.
 typedef PolyGeofenceStatusChanged = Future<void> Function(
     PolyGeofence polyGeofence,
     PolyGeofenceStatus polyGeofenceStatus,
-    LocationData locationData);
+    Location location);
+
+/// Callback function to handle location changes.
+typedef LocationChanged = void Function(Location location);
 
 /// A class provides polygon geofence management and geo-fencing.
 class PolyGeofenceService {
@@ -39,19 +41,15 @@ class PolyGeofenceService {
   /// Returns whether the service is running.
   bool get isRunningService => _isRunningService;
 
-  final _location = Location();
-  final _options = PolyGeofenceServiceOptions();
+  final PolyGeofenceServiceOptions _options = PolyGeofenceServiceOptions();
 
-  final _locationServiceStatusChangeEventChannel =
-      const EventChannel('poly_geofence_service/location_service_status');
-
-  StreamSubscription<LocationData>? _locationDataSubscription;
-  StreamSubscription<bool>? _locationServiceStatusSubscription;
+  StreamSubscription<Location>? _locationSubscription;
+  StreamSubscription<bool>? _locationServicesStatusSubscription;
 
   final _polyGeofenceList = <PolyGeofence>[];
   final _polyGeofenceStatusChangeListeners = <PolyGeofenceStatusChanged>[];
-  final _locationDataChangeListeners = <ValueChanged<LocationData>>[];
-  final _locationServiceStatusChangeListeners = <ValueChanged<bool>>[];
+  final _locationChangeListeners = <LocationChanged>[];
+  final _locationServicesStatusChangeListeners = <ValueChanged<bool>>[];
   final _streamErrorListeners = <ValueChanged>[];
 
   /// Setup [PolyGeofenceService].
@@ -100,13 +98,13 @@ class PolyGeofenceService {
 
   /// Pause [PolyGeofenceService].
   void pause() {
-    _locationDataSubscription?.pause();
+    _locationSubscription?.pause();
     _printDevLog('PolyGeofenceService paused.');
   }
 
   /// Resume [PolyGeofenceService].
   void resume() {
-    _locationDataSubscription?.resume();
+    _locationSubscription?.resume();
     _printDevLog('PolyGeofenceService resumed.');
   }
 
@@ -126,34 +124,34 @@ class PolyGeofenceService {
         'The PolyGeofenceStatusChange listener has been removed. (size: ${_polyGeofenceStatusChangeListeners.length})');
   }
 
-  /// Register a closure to be called when the [LocationData] changes.
-  void addLocationDataChangeListener(ValueChanged<LocationData> listener) {
-    _locationDataChangeListeners.add(listener);
+  /// Register a closure to be called when the [Location] changes.
+  void addLocationChangeListener(LocationChanged listener) {
+    _locationChangeListeners.add(listener);
     _printDevLog(
-        'Added LocationDataChange listener. (size: ${_locationDataChangeListeners.length})');
+        'Added LocationChange listener. (size: ${_locationChangeListeners.length})');
   }
 
   /// Remove a previously registered closure from the list of closures that
-  /// are notified when the [LocationData] changes.
-  void removeLocationDataChangeListener(ValueChanged<LocationData> listener) {
-    _locationDataChangeListeners.remove(listener);
+  /// are notified when the [Location] changes.
+  void removeLocationChangeListener(LocationChanged listener) {
+    _locationChangeListeners.remove(listener);
     _printDevLog(
-        'The LocationDataChange listener has been removed. (size: ${_locationDataChangeListeners.length})');
+        'The LocationChange listener has been removed. (size: ${_locationChangeListeners.length})');
   }
 
-  /// Register a closure to be called when the location service status changes.
-  void addLocationServiceStatusChangeListener(ValueChanged<bool> listener) {
-    _locationServiceStatusChangeListeners.add(listener);
+  /// Register a closure to be called when the location services status changes.
+  void addLocationServicesStatusChangeListener(ValueChanged<bool> listener) {
+    _locationServicesStatusChangeListeners.add(listener);
     _printDevLog(
-        'Added LocationServiceStatusChange listener. (size: ${_locationServiceStatusChangeListeners.length})');
+        'Added LocationServicesStatusChange listener. (size: ${_locationServicesStatusChangeListeners.length})');
   }
 
   /// Remove a previously registered closure from the list of closures that
-  /// are notified when the location service status changes.
-  void removeLocationServiceStatusChangeListener(ValueChanged<bool> listener) {
-    _locationServiceStatusChangeListeners.remove(listener);
+  /// are notified when the location services status changes.
+  void removeLocationServicesStatusChangeListener(ValueChanged<bool> listener) {
+    _locationServicesStatusChangeListeners.remove(listener);
     _printDevLog(
-        'The LocationServiceStatusChange listener has been removed. (size: ${_locationServiceStatusChangeListeners.length})');
+        'The LocationServicesStatusChange listener has been removed. (size: ${_locationServicesStatusChangeListeners.length})');
   }
 
   /// Register a closure to be called when a stream error occurs.
@@ -211,71 +209,67 @@ class PolyGeofenceService {
   }
 
   Future<void> _checkPermissions() async {
-    // Check that the location service is enabled.
-    final serviceEnabled = await _location.serviceEnabled();
-    if (!serviceEnabled)
-      return Future.error(ErrorCodes.LOCATION_SERVICE_DISABLED);
+    // Check whether location services are enabled.
+    if (!await FlLocation.isLocationServicesEnabled)
+      return Future.error(ErrorCodes.LOCATION_SERVICES_DISABLED);
 
     // Check whether to allow location permission.
-    PermissionStatus permissionStatus = await _location.hasPermission();
-    if (permissionStatus == PermissionStatus.deniedForever) {
+    var locationPermission = await FlLocation.checkLocationPermission();
+    if (locationPermission == LocationPermission.deniedForever) {
       return Future.error(ErrorCodes.LOCATION_PERMISSION_PERMANENTLY_DENIED);
-    } else if (permissionStatus == PermissionStatus.denied) {
-      permissionStatus = await _location.requestPermission();
-      if (permissionStatus == PermissionStatus.denied ||
-          permissionStatus == PermissionStatus.deniedForever)
+    } else if (locationPermission == LocationPermission.denied) {
+      locationPermission = await FlLocation.requestLocationPermission();
+      if (locationPermission == LocationPermission.denied ||
+          locationPermission == LocationPermission.deniedForever)
         return Future.error(ErrorCodes.LOCATION_PERMISSION_DENIED);
     }
   }
 
   Future<void> _listenStream() async {
-    _location.changeSettings(
-        accuracy: LocationAccuracy.navigation, interval: _options.interval);
-    _locationDataSubscription = _location.onLocationChanged
-        .handleError(_handleStreamError)
-        .listen(_onLocationDataReceive);
+    _locationSubscription = FlLocation.getLocationStream(
+      accuracy: LocationAccuracy.navigation,
+      interval: _options.interval,
+    ).handleError(_handleStreamError).listen(_onLocationReceive);
 
-    _locationServiceStatusSubscription =
-        _locationServiceStatusChangeEventChannel
-            .receiveBroadcastStream()
-            .map((event) => event == true)
-            .listen(_onLocationServiceStatusChange);
+    _locationServicesStatusSubscription =
+        FlLocation.getLocationServicesStatusStream()
+            .map((event) => event == LocationServicesStatus.enabled)
+            .listen(_onLocationServicesStatusChange);
   }
 
   Future<void> _cancelStream() async {
-    await _locationDataSubscription?.cancel();
-    _locationDataSubscription = null;
+    await _locationSubscription?.cancel();
+    _locationSubscription = null;
 
-    await _locationServiceStatusSubscription?.cancel();
-    _locationServiceStatusSubscription = null;
+    await _locationServicesStatusSubscription?.cancel();
+    _locationServicesStatusSubscription = null;
   }
 
-  void _onLocationDataReceive(LocationData locationData) async {
-    if (locationData.latitude == null || locationData.longitude == null) return;
-    if ((locationData.isMock ?? false) && !_options.allowMockLocations) return;
-    if ((locationData.accuracy ?? 0.0) > _options.accuracy) return;
+  void _onLocationReceive(Location location) async {
+    if (location.isMock && !_options.allowMockLocations) return;
+    if (location.accuracy > _options.accuracy) return;
 
-    for (final listener in _locationDataChangeListeners) listener(locationData);
+    for (final listener in _locationChangeListeners) listener(location);
 
-    // Pause the service and process the location data.
-    _locationDataSubscription?.pause();
+    // Pause the service and process the location.
+    _locationSubscription?.pause();
 
     PolyGeofence polyGeofence;
     PolyGeofenceStatus polyGeofenceStatus;
-    final currTimestamp = (locationData.time == null)
-        ? DateTime.now()
-        : DateTime.fromMillisecondsSinceEpoch(locationData.time!.toInt());
+
+    final currTimestamp = location.timestamp;
     DateTime? polyTimestamp;
     Duration diffTimestamp;
     bool containsLocation;
+
     for (var i = 0; i < _polyGeofenceList.length; i++) {
       polyGeofence = _polyGeofenceList[i];
 
       polyTimestamp = polyGeofence.timestamp;
       diffTimestamp = currTimestamp.difference(polyTimestamp ?? currTimestamp);
 
-      containsLocation = PolyUtils.containsLocation(locationData.latitude!,
-          locationData.longitude!, polyGeofence.polygon);
+      containsLocation = PolyUtils.containsLocation(
+          location.latitude, location.longitude, polyGeofence.polygon);
 
       if (containsLocation) {
         polyGeofenceStatus = PolyGeofenceStatus.ENTER;
@@ -295,16 +289,16 @@ class PolyGeofenceService {
         continue;
 
       for (final listener in _polyGeofenceStatusChangeListeners)
-        await listener(polyGeofence, polyGeofenceStatus, locationData)
+        await listener(polyGeofence, polyGeofenceStatus, location)
             .catchError(_handleStreamError);
     }
 
-    // Service resumes when the location data processing is complete.
-    _locationDataSubscription?.resume();
+    // Service resumes when the location processing is complete.
+    _locationSubscription?.resume();
   }
 
-  void _onLocationServiceStatusChange(bool status) {
-    for (final listener in _locationServiceStatusChangeListeners)
+  void _onLocationServicesStatusChange(bool status) {
+    for (final listener in _locationServicesStatusChangeListeners)
       listener(status);
   }
 

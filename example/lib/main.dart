@@ -45,21 +45,21 @@ class _ExampleAppState extends State<ExampleApp> {
   Future<void> _onPolyGeofenceStatusChanged(
       PolyGeofence polyGeofence,
       PolyGeofenceStatus polyGeofenceStatus,
-      LocationData locationData) async {
+      Location location) async {
     print('polyGeofence: ${polyGeofence.toJson()}');
-    print('locationData: ${locationData.toString()}');
+    print('polyGeofenceStatus: ${polyGeofenceStatus.toString()}');
     _streamController.sink.add(polyGeofence);
   }
 
-  // This function is to be called when the location data has changed.
-  void _onLocationDataChanged(LocationData locationData) {
-    print('locationData: ${locationData.toString()}');
+  // This function is to be called when the location has changed.
+  void _onLocationChanged(Location location) {
+    print('location: ${location.toJson()}');
   }
 
-  // This function is to be called when a location service status change occurs
+  // This function is to be called when a location services status change occurs
   // since the service was started.
-  void _onLocationServiceStatusChanged(bool status) {
-    print('location service status: $status');
+  void _onLocationServicesStatusChanged(bool status) {
+    print('isLocationServicesEnabled: $status');
   }
 
   // This function is used to handle errors that occur in the service.
@@ -78,8 +78,8 @@ class _ExampleAppState extends State<ExampleApp> {
     super.initState();
     WidgetsBinding.instance?.addPostFrameCallback((_) {
       _polyGeofenceService.addPolyGeofenceStatusChangeListener(_onPolyGeofenceStatusChanged);
-      _polyGeofenceService.addLocationDataChangeListener(_onLocationDataChanged);
-      _polyGeofenceService.addLocationServiceStatusChangeListener(_onLocationServiceStatusChanged);
+      _polyGeofenceService.addLocationChangeListener(_onLocationChanged);
+      _polyGeofenceService.addLocationServicesStatusChangeListener(_onLocationServicesStatusChanged);
       _polyGeofenceService.addStreamErrorListener(_onError);
       _polyGeofenceService.start(_polyGeofenceList).catchError(_onError);
     });
