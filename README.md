@@ -45,6 +45,7 @@ And specify the service inside the `<application>` tag as follows.
 ```
 <service
     android:name="com.pravera.flutter_foreground_task.service.ForegroundService"
+    android:foregroundServiceType="location"
     android:stopWithTask="true" />
 ```
 
