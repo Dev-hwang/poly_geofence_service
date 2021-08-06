@@ -291,7 +291,8 @@ class PolyGeofenceService {
         polyGeofenceStatus = PolyGeofenceStatus.EXIT;
       }
 
-      if (polyTimestamp != null &&
+      if (polyGeofenceStatus != PolyGeofenceStatus.DWELL &&
+          polyTimestamp != null &&
           diffTimestamp.inMilliseconds < _options.statusChangeDelayMs) continue;
       if (!polyGeofence.updateStatus(polyGeofenceStatus, currTimestamp))
         continue;
