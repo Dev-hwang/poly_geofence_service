@@ -169,6 +169,14 @@ class PolyGeofenceService {
         'The StreamError listener has been removed. (size: ${_streamErrorListeners.length})');
   }
 
+  /// Clears all listeners registered with the service.
+  void clearAllListeners() {
+    _polyGeofenceStatusChangeListeners.clear();
+    _locationChangeListeners.clear();
+    _locationServicesStatusChangeListeners.clear();
+    _streamErrorListeners.clear();
+  }
+
   /// Add polygon geofence.
   void addPolyGeofence(PolyGeofence polyGeofence) {
     _polyGeofenceList.add(polyGeofence);

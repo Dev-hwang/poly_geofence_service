@@ -229,6 +229,7 @@ _polyGeofenceService.removePolyGeofenceStatusChangeListener(_onPolyGeofenceStatu
 _polyGeofenceService.removeLocationChangeListener(_onLocationChanged);
 _polyGeofenceService.removeLocationServicesStatusChangeListener(_onLocationServicesStatusChanged);
 _polyGeofenceService.removeStreamErrorListener(_onError);
+_polyGeofenceService.clearAllListeners();
 _polyGeofenceService.stop();
 ```
 
