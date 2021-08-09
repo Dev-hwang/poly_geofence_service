@@ -1,3 +1,7 @@
+## 1.4.1
+
+* Upgrade fl_location: ^1.0.1
+
 ## 1.4.0
 
 * Upgrade flutter_foreground_task: ^2.1.0
