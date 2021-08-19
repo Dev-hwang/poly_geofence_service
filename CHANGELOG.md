@@ -1,3 +1,7 @@
+## 1.4.2
+
+* Fix errorCodes parsing function not working properly.
+
 ## 1.4.1
 
 * Upgrade fl_location: ^1.0.1
