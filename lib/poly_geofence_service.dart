@@ -4,7 +4,7 @@ import 'dart:developer' as dev;
 import 'package:fl_location/fl_location.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:poly_geofence_service/models/error_codes.dart';
+import 'package:poly_geofence_service/errors/error_codes.dart';
 import 'package:poly_geofence_service/models/poly_geofence.dart';
 import 'package:poly_geofence_service/models/poly_geofence_service_options.dart';
 import 'package:poly_geofence_service/models/poly_geofence_status.dart';
@@ -12,7 +12,7 @@ import 'package:poly_geofence_service/utils/poly_utils.dart';
 
 export 'package:fl_location/fl_location.dart';
 export 'package:flutter_foreground_task/flutter_foreground_task.dart';
-export 'package:poly_geofence_service/models/error_codes.dart';
+export 'package:poly_geofence_service/errors/error_codes.dart';
 export 'package:poly_geofence_service/models/lat_lng.dart';
 export 'package:poly_geofence_service/models/poly_geofence.dart';
 export 'package:poly_geofence_service/models/poly_geofence_service_options.dart';
