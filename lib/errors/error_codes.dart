@@ -19,8 +19,9 @@ enum ErrorCodes {
 
 /// Returns the error codes from [value].
 ErrorCodes? getErrorCodesFromString(String value) {
-  final errorCodes =
-      ErrorCodes.values.where((e) => e.toString() == 'ErrorCodes.$value');
+  final errorCodes = ErrorCodes.values.where((e) =>
+      e.toString() == value ||
+      e.toString() == 'ErrorCodes.${value.toUpperCase()}');
 
   if (errorCodes.isNotEmpty) return errorCodes.first;
   return null;
@@ -35,5 +36,5 @@ ErrorCodes? getErrorCodesFromError(dynamic error) {
     return getErrorCodesFromString(pe.code);
   }
 
-  return null;
+  return getErrorCodesFromString(error.toString());
 }
