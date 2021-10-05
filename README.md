@@ -19,7 +19,7 @@ To use this plugin, add `poly_geofence_service` as a [dependency in your pubspec
 
 ```yaml
 dependencies:
-  poly_geofence_service: ^1.4.2
+  poly_geofence_service: ^1.5.0
 ```
 
 After adding the `poly_geofence_service` plugin to the flutter project, we need to specify the platform-specific permissions and services to use for this plugin to work properly.
