@@ -190,6 +190,7 @@ Widget build(BuildContext context) {
         channelDescription: 'This notification appears when the geofence service is running in the background.',
         channelImportance: NotificationChannelImportance.LOW,
         priority: NotificationPriority.LOW,
+        isSticky: false,
       ),
       iosNotificationOptions: IOSNotificationOptions(),
       notificationTitle: 'Geofence Service is running',
