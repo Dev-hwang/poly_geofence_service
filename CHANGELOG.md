@@ -1,3 +1,7 @@
+## 1.5.1
+
+* Upgrade flutter_foreground_task: ^3.2.0
+
 ## 1.5.0
 
 * Upgrade flutter_foreground_task: ^3.0.0+1
