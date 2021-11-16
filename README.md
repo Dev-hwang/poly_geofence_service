@@ -185,7 +185,7 @@ Widget build(BuildContext context) {
         // You can add a foreground task start condition.
         return _polyGeofenceService.isRunningService;
       },
-      androidNotificationOptions: AndroidNotificationOptions(
+      androidNotificationOptions: const AndroidNotificationOptions(
         channelId: 'geofence_service_notification_channel',
         channelName: 'Geofence Service Notification',
         channelDescription: 'This notification appears when the geofence service is running in the background.',
@@ -193,7 +193,7 @@ Widget build(BuildContext context) {
         priority: NotificationPriority.LOW,
         isSticky: false,
       ),
-      iosNotificationOptions: IOSNotificationOptions(),
+      iosNotificationOptions: const IOSNotificationOptions(),
       notificationTitle: 'Geofence Service is running',
       notificationText: 'Tap to return to the app',
       child: Scaffold(
