@@ -1,3 +1,9 @@
+## 1.5.3
+
+* Upgrade dependencies.
+* Bump Android minSdkVersion to 23.
+* Bump Android compileSdkVersion to 31.
+
 ## 1.5.2
 
 * Upgrade flutter_foreground_task: ^3.2.2
@@ -9,7 +15,7 @@
 
 ## 1.5.0
 
-* Upgrade flutter_foreground_task: ^3.0.0+1
+* Upgrade flutter_foreground_task: ^3.0.0
 * Changed parameter name of `WillStartForegroundTask` widget.
 
 ## 1.4.2
