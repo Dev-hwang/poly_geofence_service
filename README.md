@@ -19,7 +19,7 @@ To use this plugin, add `poly_geofence_service` as a [dependency in your pubspec
 
 ```yaml
 dependencies:
-  poly_geofence_service: ^1.5.4
+  poly_geofence_service: ^1.5.5
 ```
 
 After adding the `poly_geofence_service` plugin to the flutter project, we need to specify the platform-specific permissions and services to use for this plugin to work properly.
@@ -185,7 +185,7 @@ Widget build(BuildContext context) {
         // You can add a foreground task start condition.
         return _polyGeofenceService.isRunningService;
       },
-      androidNotificationOptions: const AndroidNotificationOptions(
+      androidNotificationOptions: AndroidNotificationOptions(
         channelId: 'geofence_service_notification_channel',
         channelName: 'Geofence Service Notification',
         channelDescription: 'This notification appears when the geofence service is running in the background.',
