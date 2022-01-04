@@ -54,13 +54,14 @@ class PolyGeofenceService {
 
   /// Setup [PolyGeofenceService].
   /// Some options do not change while the service is running.
-  PolyGeofenceService setup(
-      {int? interval,
-      int? accuracy,
-      int? loiteringDelayMs,
-      int? statusChangeDelayMs,
-      bool? allowMockLocations,
-      bool? printDevLog}) {
+  PolyGeofenceService setup({
+    int? interval,
+    int? accuracy,
+    int? loiteringDelayMs,
+    int? statusChangeDelayMs,
+    bool? allowMockLocations,
+    bool? printDevLog,
+  }) {
     _options.interval = interval;
     _options.accuracy = accuracy;
     _options.loiteringDelayMs = loiteringDelayMs;
@@ -186,8 +187,9 @@ class PolyGeofenceService {
 
   /// Add polygon geofence list.
   void addPolyGeofenceList(List<PolyGeofence> polyGeofenceList) {
-    for (var i = 0; i < polyGeofenceList.length; i++)
+    for (var i = 0; i < polyGeofenceList.length; i++) {
       addPolyGeofence(polyGeofenceList[i]);
+    }
   }
 
   /// Remove polygon geofence.
@@ -199,8 +201,9 @@ class PolyGeofenceService {
 
   /// Remove polygon geofence list.
   void removePolyGeofenceList(List<PolyGeofence> polyGeofenceList) {
-    for (var i = 0; i < polyGeofenceList.length; i++)
+    for (var i = 0; i < polyGeofenceList.length; i++) {
       removePolyGeofence(polyGeofenceList[i]);
+    }
   }
 
   /// Remove polygon geofence by [id].
@@ -218,8 +221,9 @@ class PolyGeofenceService {
 
   Future<void> _checkPermissions() async {
     // Check whether location services are enabled.
-    if (!await FlLocation.isLocationServicesEnabled)
+    if (!await FlLocation.isLocationServicesEnabled) {
       return Future.error(ErrorCodes.LOCATION_SERVICES_DISABLED);
+    }
 
     // Check whether to allow location permission.
     var locationPermission = await FlLocation.checkLocationPermission();
@@ -228,8 +232,9 @@ class PolyGeofenceService {
     } else if (locationPermission == LocationPermission.denied) {
       locationPermission = await FlLocation.requestLocationPermission();
       if (locationPermission == LocationPermission.denied ||
-          locationPermission == LocationPermission.deniedForever)
+          locationPermission == LocationPermission.deniedForever) {
         return Future.error(ErrorCodes.LOCATION_PERMISSION_DENIED);
+      }
     }
   }
 
@@ -257,7 +262,9 @@ class PolyGeofenceService {
     if (location.isMock && !_options.allowMockLocations) return;
     if (location.accuracy > _options.accuracy) return;
 
-    for (final listener in _locationChangeListeners) listener(location);
+    for (final listener in _locationChangeListeners) {
+      listener(location);
+    }
 
     // Pause the service and process the location.
     _locationSubscription?.pause();
@@ -293,13 +300,18 @@ class PolyGeofenceService {
 
       if (polyGeofenceStatus != PolyGeofenceStatus.DWELL &&
           polyTimestamp != null &&
-          diffTimestamp.inMilliseconds < _options.statusChangeDelayMs) continue;
-      if (!polyGeofence.updateStatus(polyGeofenceStatus, currTimestamp))
+          diffTimestamp.inMilliseconds < _options.statusChangeDelayMs) {
         continue;
+      }
 
-      for (final listener in _polyGeofenceStatusChangeListeners)
+      if (!polyGeofence.updateStatus(polyGeofenceStatus, currTimestamp)) {
+        continue;
+      }
+
+      for (final listener in _polyGeofenceStatusChangeListeners) {
         await listener(polyGeofence, polyGeofenceStatus, location)
             .catchError(_handleStreamError);
+      }
     }
 
     // Service resumes when the location processing is complete.
@@ -307,12 +319,15 @@ class PolyGeofenceService {
   }
 
   void _onLocationServicesStatusChange(bool status) {
-    for (final listener in _locationServicesStatusChangeListeners)
+    for (final listener in _locationServicesStatusChangeListeners) {
       listener(status);
+    }
   }
 
   void _handleStreamError(dynamic error) {
-    for (final listener in _streamErrorListeners) listener(error);
+    for (final listener in _streamErrorListeners) {
+      listener(error);
+    }
   }
 
   void _printDevLog(String message) {
