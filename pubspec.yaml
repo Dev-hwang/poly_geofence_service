@@ -1,6 +1,6 @@
 name: poly_geofence_service
 description: This plugin is a service that can perform geo-fencing by creating a polygon geofence.
-version: 1.5.7
+version: 1.5.8
 homepage: https://github.com/Dev-hwang/poly_geofence_service
 
 environment:
