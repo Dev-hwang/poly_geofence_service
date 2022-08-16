@@ -11,9 +11,9 @@ dependencies:
   flutter:
     sdk: flutter
 
-  fl_location: ^1.2.1
-  vector_math: ^2.1.0
-  flutter_foreground_task: ^3.5.5
+  fl_location: ^1.2.2
+  vector_math: ^2.1.2
+  flutter_foreground_task: ^3.8.2
 
 dev_dependencies:
   flutter_test:
