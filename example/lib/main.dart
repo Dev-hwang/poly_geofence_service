@@ -6,7 +6,7 @@ import 'package:poly_geofence_service/poly_geofence_service.dart';
 void main() => runApp(const ExampleApp());
 
 class ExampleApp extends StatefulWidget {
-  const ExampleApp({Key key}) : super(key: key);
+  const ExampleApp({Key? key}) : super(key: key);
 
   @override
   _ExampleAppState createState() => _ExampleAppState();
@@ -78,7 +78,7 @@ class _ExampleAppState extends State<ExampleApp> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       _polyGeofenceService.addPolyGeofenceStatusChangeListener(_onPolyGeofenceStatusChanged);
       _polyGeofenceService.addLocationChangeListener(_onLocationChanged);
       _polyGeofenceService.addLocationServicesStatusChangeListener(_onLocationServicesStatusChanged);
