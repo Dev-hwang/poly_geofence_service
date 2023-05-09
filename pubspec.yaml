@@ -1,25 +1,25 @@
 name: poly_geofence_service
 description: This plugin is a service that can perform geo-fencing by creating a polygon geofence.
-version: 1.6.0
+version: 2.0.0
 homepage: https://github.com/Dev-hwang/poly_geofence_service
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
-  flutter: ">=1.20.0"
+  sdk: ">=2.17.0 <3.0.0"
+  flutter: ">=3.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
 
-  fl_location: ^1.2.2
+  fl_location: ^2.0.0+1
   vector_math: ^2.1.2
-  flutter_foreground_task: ^3.8.2
+  flutter_foreground_task: ^4.1.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  flutter_lints: ^1.0.0
+  flutter_lints: ^2.0.0
 
 flutter:
   plugin:
