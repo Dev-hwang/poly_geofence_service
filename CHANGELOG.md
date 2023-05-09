@@ -1,3 +1,8 @@
+## 2.0.0
+
+* [**CHORE**] Upgrade minimum Flutter version to 3.0.0
+* [**CHORE**] Upgrade dependencies
+
 ## 1.6.0
 
 * Upgrade dependencies.
