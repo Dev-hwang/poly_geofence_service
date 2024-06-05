@@ -3,15 +3,14 @@ This plugin is a service that can perform geo-fencing by creating a polygon geof
 [![pub package](https://img.shields.io/pub/v/poly_geofence_service.svg)](https://pub.dev/packages/poly_geofence_service)
 
 ## Screenshots
-| Google Maps | Result |
-|---|---|
+| Google Maps                                                                                                                   | Result                                                                                                                        |
+|-------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
 | <img src="https://user-images.githubusercontent.com/47127353/115559838-07ff7e00-a2ef-11eb-9495-e78093d591de.png" width="216"> | <img src="https://user-images.githubusercontent.com/47127353/115560180-4e54dd00-a2ef-11eb-8d7b-2d73630512b6.png" width="216"> |
 
 ## Features
 
 * Complex geo-fencing can be performed by creating polygon geofence.
 * `PolyGeofenceService` can perform geo-fencing in real time and catch errors during operation.
-* `PolyGeofenceService` can be operated in the background using `WillStartForegroundTask` widget.
 
 ## Getting started
 
@@ -33,23 +32,6 @@ Since geo-fencing operates based on location, we need to add the following permi
 <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 ```
 
-If you want to run the service in the background, add the following permission. If your project supports Android 10, be sure to add the `ACCESS_BACKGROUND_LOCATION` permission.
-
-```
-<uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
-<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-<uses-permission android:name="android.permission.WAKE_LOCK" />
-```
-
-And specify the service inside the `<application>` tag as follows.
-
-```
-<service
-    android:name="com.pravera.flutter_foreground_task.service.ForegroundService"
-    android:foregroundServiceType="location"
-    android:stopWithTask="true" />
-```
-
 ### :baby_chick: iOS
 
 Like Android platform, geo-fencing is based on location, we need to add the following description. Open the `ios/Runner/Info.plist` file and specify it inside the `<dict>` tag.
@@ -57,63 +39,6 @@ Like Android platform, geo-fencing is based on location, we need to add the foll
 ```
 <key>NSLocationWhenInUseUsageDescription</key>
 <string>Used to provide geofence service.</string>
-```
-
-If you want to run the service in the background, add the following description.
-
-```
-<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-<string>Used to provide geofence services in the background.</string>
-<key>NSLocationAlwaysUsageDescription</key>
-<string>Used to provide geofence services in the background.</string>
-<key>UIBackgroundModes</key>
-<array>
-    <string>fetch</string>
-    <string>location</string>
-</array>
-```
-
-(**Optional**) To display a notification when your app enters the background, you need to open the `ios/Runner/AppDelegate` file and set the following:
-
-**Objective-C**:
-
-```objectivec
-@implementation AppDelegate
-
-- (BOOL)application:(UIApplication *)application
-    didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-  [GeneratedPluginRegistrant registerWithRegistry:self];
-
-  // here
-  if (@available(iOS 10.0, *)) {
-    [UNUserNotificationCenter currentNotificationCenter].delegate = (id<UNUserNotificationCenterDelegate>) self;
-  }
-
-  return [super application:application didFinishLaunchingWithOptions:launchOptions];
-}
-
-@end
-```
-
-**Swift**:
-
-```swift
-@UIApplicationMain
-@objc class AppDelegate: FlutterAppDelegate {
-  override func application(
-    _ application: UIApplication,
-    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
-  ) -> Bool {
-    GeneratedPluginRegistrant.register(with: self)
-
-    // here
-    if #available(iOS 10.0, *) {
-      UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate
-    }
-
-    return super.application(application, didFinishLaunchingWithOptions: launchOptions)
-  }
-}
 ```
 
 ## How to use
@@ -210,49 +135,7 @@ void initState() {
 }
 ```
 
-4. Add `WillStartForegroundTask` widget for background execution on Android platform. `WillStartForegroundTask` provides the following options:
-* `onWillStart`: Called to ask if you want to start the foreground task.
-* `notificationOptions`: Optional values for notification detail settings.
-* `notificationTitle`: The title that will be displayed in the notification.
-* `notificationText`: The text that will be displayed in the notification.
-* `child`: A child widget that contains the `Scaffold` widget.
-
-```dart
-@override
-Widget build(BuildContext context) {
-  return MaterialApp(
-    // A widget used when you want to start a foreground task when trying to minimize or close the app.
-    // Declare on top of the [Scaffold] widget.
-    home: WillStartForegroundTask(
-      onWillStart: () async {
-        // You can add a foreground task start condition.
-        return _polyGeofenceService.isRunningService;
-      },
-      androidNotificationOptions: AndroidNotificationOptions(
-        channelId: 'geofence_service_notification_channel',
-        channelName: 'Geofence Service Notification',
-        channelDescription: 'This notification appears when the geofence service is running in the background.',
-        channelImportance: NotificationChannelImportance.LOW,
-        priority: NotificationPriority.LOW,
-        isSticky: false,
-      ),
-      iosNotificationOptions: const IOSNotificationOptions(),
-      foregroundTaskOptions: const ForegroundTaskOptions(),
-      notificationTitle: 'Geofence Service is running',
-      notificationText: 'Tap to return to the app',
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Poly Geofence Service'),
-          centerTitle: true,
-        ),
-        body: _buildContentView(),
-      ),
-    ),
-  );
-}
-```
-
-5. To add or remove `PolyGeofence` while the service is running, use the following function:
+4. To add or remove `PolyGeofence` while the service is running, use the following function:
 
 ```text
 _polyGeofenceService.addPolyGeofence(Object);
@@ -263,14 +146,14 @@ _polyGeofenceService.removePolyGeofenceById(String);
 _polyGeofenceService.clearPolyGeofenceList();
 ```
 
-6. If you want to pause or resume the service, use the function below.
+5. If you want to pause or resume the service, use the function below.
 
 ```text
 _polyGeofenceService.pause();
 _polyGeofenceService.resume();
 ```
 
-7. When you are finished using the service, unregister the listener and call `PolyGeofenceService.instance.stop()`.
+6. When you are finished using the service, unregister the listener and call `PolyGeofenceService.instance.stop()`.
 
 ```text
 _polyGeofenceService.removePolyGeofenceStatusChangeListener(_onPolyGeofenceStatusChanged);
@@ -289,43 +172,43 @@ _polyGeofenceService.stop();
 
 A model representing the latitude and longitude of GPS.
 
-| Property | Description |
-|---|---|
-| `latitude` | The latitude of GPS. |
+| Property    | Description           |
+|-------------|-----------------------|
+| `latitude`  | The latitude of GPS.  |
 | `longitude` | The longitude of GPS. |
 
 ### :chicken: PolyGeofence
 
 A model representing a polygon geofence.
 
-| Property | Description |
-|---|---|
-| `id` | Identifier for `PolyGeofence`. |
-| `data` | Custom data for `PolyGeofence`. |
-| `polygon` | A list of coordinates to create a polygon. The polygon is always considered closed, regardless of whether the last point equals the first or not. |
-| `status` | The status of `PolyGeofence`. |
-| `timestamp` | The timestamp when polygon geofence status changes. |
+| Property    | Description                                                                                                                                       |
+|-------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
+| `id`        | Identifier for `PolyGeofence`.                                                                                                                    |
+| `data`      | Custom data for `PolyGeofence`.                                                                                                                   |
+| `polygon`   | A list of coordinates to create a polygon. The polygon is always considered closed, regardless of whether the last point equals the first or not. |
+| `status`    | The status of `PolyGeofence`.                                                                                                                     |
+| `timestamp` | The timestamp when polygon geofence status changes.                                                                                               |
 
 ### :chicken: PolyGeofenceStatus
 
 Defines the status of the polygon geofence.
 
-| Value | Description |
-|---|---|
-| `ENTER` | Occurs when entering the geofence area. |
-| `EXIT` | Occurs when exiting the geofence area. |
+| Value   | Description                                                               |
+|---------|---------------------------------------------------------------------------|
+| `ENTER` | Occurs when entering the geofence area.                                   |
+| `EXIT`  | Occurs when exiting the geofence area.                                    |
 | `DWELL` | Occurs when the loitering delay elapses after entering the geofence area. |
 
 ### :chicken: ErrorCodes
 
 Error codes that may occur in the service.
 
-| Value | Description |
-|---|---|
-| `ALREADY_STARTED` | Occurs when the service has already been started but the start function is called. |
-| `LOCATION_SERVICES_DISABLED` | Occurs when location services are disabled. When this error occurs, you should notify the user and request activation. |
-| `LOCATION_PERMISSION_DENIED` | Occurs when location permission is denied. |
-| `LOCATION_PERMISSION_PERMANENTLY_DENIED` | Occurs when location permission is permanently denied. In this case, the user must manually allow the permission. |
+| Value                                    | Description                                                                                                            |
+|------------------------------------------|------------------------------------------------------------------------------------------------------------------------|
+| `ALREADY_STARTED`                        | Occurs when the service has already been started but the start function is called.                                     |
+| `LOCATION_SERVICES_DISABLED`             | Occurs when location services are disabled. When this error occurs, you should notify the user and request activation. |
+| `LOCATION_PERMISSION_DENIED`             | Occurs when location permission is denied.                                                                             |
+| `LOCATION_PERMISSION_PERMANENTLY_DENIED` | Occurs when location permission is permanently denied. In this case, the user must manually allow the permission.      |
 
 ## Support
 
