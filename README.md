@@ -1,3 +1,5 @@
+# This plugin has been deprecated. You can use [geofencing_api](https://pub.dev/packages/geofencing_api) instead.
+
 This plugin is a service that can perform geo-fencing by creating a polygon geofence. It does not use the Geofence API implemented on the platform. Therefore, battery efficiency cannot be guaranteed. Instead, this plugin can provide more accurate and realtime geo-fencing by navigating your location while your app is alive.
 
 [![pub package](https://img.shields.io/pub/v/poly_geofence_service.svg)](https://pub.dev/packages/poly_geofence_service)
